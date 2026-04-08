@@ -17,48 +17,57 @@ The primary goal of this project is to compare different strategies for generati
     * **Online**: Generates permutations in real time, executing all search and logic reversal at each step, while recording them as "transactions" (swap indices).
     * **Offline**: Focuses on optimized execution through a pre-computed **Transition Table**. In this mode, permutation generation involves $O(1)$ complexity per step, eliminating searches and comparisons by only following previously recorded indices.
 
-## Analysis Metrics
+## Test & Analysis Methodology: 
+
+To ensure the validity of the experimental data, the main script executes: 
+1. **Cleanup:** Garbage collection (gc.collect()) between runs to avoid memory residue from previous tests. 
+2. **Isolation:** Resetting the memory tracer (tracemalloc) for each value of $n$. 
+3. **Standardization:** Using the same input vector (randomly shuffled) for all algorithms in a given $n$.
 
 For rigorous analysis according to academic guidelines, assignments ($A$) are divided into:
 * **$A$ (local vars)**: Assignments to control variables and search logic (e.g., `mobile`, `prox_idx`).
 * **$A$ (to/from V)**: Assignments that directly manipulate the permutation and mechanics vectors (`a` and `d`).
 * **Comparisons**: Logical tests to find moving elements and boundary limits.
 * **Swaps**: Physical movements of elements in the vector.
+* **Memory (KB)**: Peak amount of RAM allocated during execution.
+* **Time (ms)**: Total execution time in milliseconds.
 
 ## Performance Analysis
 
 ![img1](results/T%20offline.png) ![img2](results/T%20online.png)
+
+![img3](results/recursos.png)
 
 The project evaluates the "viability range" for precomputing sequences:
 * **Small $n$ ($n \le 11$)**: Precomputing the transition table is highly efficient as it eliminates the $O(n)$ search for the mobile element during execution.
 * **Large $n$ ($n \ge 12$)**: Algorithm P is preferred due to memory constraints, as the transition table size grows factorially ($n!$).
 
                 *** Algoritm: T online ***
--------------------------------------------------------------------------------------------------
-n    | n!         | Comparacoes  | Atribuicoes (local vars)  | Atribuicoes (to/from  V) | Trocas  
--------------------------------------------------------------------------------------------------
-3    | 6          | 90           | 52                        | 27                       | 5        
-4    | 24         | 508          | 252                       | 106                      | 23       
-5    | 120        | 3230         | 1436                      | 515                      | 119      
-6    | 720        | 23388        | 9606                      | 3036                     | 719      
-7    | 5040       | 191506       | 73708                     | 21037                    | 5039     
-8    | 40320      | 1753904      | 640914                    | 167198                   | 40319    
-9    | 362880     | 17781102     | 6210462                   | 1497759                  | 362879   
-10   | 3628800    | 197769580    | 66516018                  | 14924320                 | 3628799  
+--------------------------------------------------------------------------------------------------------------------------------------------
+n    | n!         | Comparacoes  | Atribuicoes (local vars)  | Atribuicoes (to/from  V) | Trocas   | Memoria (kb)    |  Tempo (ms)
+--------------------------------------------------------------------------------------------------------------------------------------------
+3    | 6          | 88           | 47                        | 32                       | 5        | 2.40            | 0.0602   
+4    | 24         | 494          | 229                       | 129                      | 23       | 1.65            | 0.2046   
+5    | 120        | 3151         | 1317                      | 634                      | 119      | 6.81            | 1.5124   
+6    | 720        | 22914        | 8887                      | 3755                     | 719      | 39.34           | 10.1741  
+7    | 5040       | 188273       | 68669                     | 26076                    | 5039     | 277.71          | 72.3029  
+8    | 40320      | 1728712      | 600595                    | 207517                   | 40319    | 2438.98         | 661.8379 
+9    | 362880     | 17559351     | 5847583                   | 1860638                  | 362879   | 22594.34        | 6330.6767 
+10   | 3628800    | 195592310    | 62887219                  | 18553119                 | 3628799  | 228483.66       | 69299.7360 
 
 
                 *** Algoritm: T offline ***
--------------------------------------------------------------------------------------------------
-n    | n!         | Comparacoes  | Atribuicoes (local vars)  | Atribuicoes (to/from  V) | Trocas  
--------------------------------------------------------------------------------------------------
-3    | 6          | 75           | 52                        | 41                       | 5        
-4    | 24         | 416          | 252                       | 157                      | 23       
-5    | 120        | 2635         | 1436                      | 759                      | 119      
-6    | 720        | 19074        | 9606                      | 4481                     | 719      
-7    | 5040       | 156233       | 73708                     | 31123                    | 5039     
-8    | 40320      | 1431352      | 640914                    | 247845                   | 40319    
-9    | 362880     | 14515191     | 6210462                   | 2223527                  | 362879   
-10   | 3628800    | 161481590    | 66516018                  | 22181929                 | 3628799  
+--------------------------------------------------------------------------------------------------------------------------------------------
+n    | n!         | Comparacoes  | Atribuicoes (local vars)  | Atribuicoes (to/from  V) | Trocas   | Memoria (kb)    |  Tempo (ms)
+--------------------------------------------------------------------------------------------------------------------------------------------
+3    | 6          | 75           | 53                        | 45                       | 10       | 1.45            | 0.0458   
+4    | 24         | 416          | 253                       | 179                      | 46       | 1.65            | 0.1378   
+5    | 120        | 2635         | 1437                      | 877                      | 238      | 6.81            | 152.4225 
+6    | 720        | 19074        | 9607                      | 5199                     | 1438     | 39.34           | 8.9450   
+7    | 5040       | 156233       | 73709                     | 36161                    | 10078    | 277.71          | 77.9957  
+8    | 40320      | 1431352      | 640915                    | 288163                   | 80638    | 2438.98         | 597.1932 
+9    | 362880     | 14515191     | 6210463                   | 2586405                  | 725758   | 22594.34        | 5900.3488 
+10   | 3628800    | 161481590    | 66516019                  | 25810727                 | 7257598  | 228483.66       | 65336.1439 
 
 ## Project Structure
 

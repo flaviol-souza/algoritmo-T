@@ -1,8 +1,9 @@
 from tracker import log_permutation, AlgorithmTracker
 
-def algoritm_t_online(n):
-    stats = AlgorithmTracker()
-    a = list(range(1, n + 1))
+def algoritm_t_online(vector, stats:AlgorithmTracker):
+    
+    a = list(vector)
+    n = len(a)
     d = [-1] * n
     stats.transactions = []
     stats.att_vector += (n *2)
@@ -20,24 +21,29 @@ def algoritm_t_online(n):
             stats.att_local += 1
 
             stats.comparisons += 1
-            if 0 <= prox < n:
+            if prox >= 0:
 
                 stats.comparisons += 1
-                if a[i] > a[prox]:
+                if prox < n:
 
                     stats.comparisons += 1
-                    if a[i] > mobile:
-                        mobile = a[i]
-                        idx_mobile = i
-                        stats.att_local += 2
+                    if a[i] > a[prox]:
+
+                        stats.comparisons += 1
+                        if a[i] > mobile:
+                            mobile = a[i]
+                            idx_mobile = i
+                            stats.att_local += 2
 
         stats.comparisons += 1
         if idx_mobile == -1:
             break
 
         destination = idx_mobile + d[idx_mobile]
+        stats.att_local += 1
+
         stats.transactions.append((idx_mobile, destination))
-        stats.att_local += 2
+        stats.att_vector += 1
     
         a[idx_mobile], a[destination] = a[destination], a[idx_mobile]
         d[idx_mobile], d[destination] = d[destination], d[idx_mobile]
@@ -45,20 +51,20 @@ def algoritm_t_online(n):
         stats.att_vector += 4
 
         for i in range(n):
-            stats.comparisons += 2
+            stats.comparisons += 1
             if a[i] > mobile:
                 d[i] = -d[i]
                 stats.att_vector += 1
 
         log_permutation(a)
 
-    return stats
-
 def __transaction_table(stats:AlgorithmTracker, n):
     a = list(range(1, n + 1))
     direction = [-1] * n
+    stats.att_vector += (n * 2)
+
     transactions = []
-    stats.att_vector += (n * 2) + 1
+    stats.att_local += 1
 
     while True:
         mobile = -1
@@ -87,12 +93,17 @@ def __transaction_table(stats:AlgorithmTracker, n):
             break
         
         prox = idx_mobile + direction[idx_mobile]
-        transactions.append((idx_mobile, prox)) 
-        stats.att_local += 2
+        stats.att_local += 1
+
+        transactions.append((idx_mobile, prox))
+        stats.att_vector += 1
 
         a[idx_mobile], a[prox] = a[prox], a[idx_mobile]
+        stats.exchanges += 1
+        stats.att_vector += 2
+
         direction[idx_mobile], direction[prox] = direction[prox], direction[idx_mobile]
-        stats.att_vector += 4
+        stats.att_vector += 2
 
         for i in range(n):
             stats.comparisons += 1
@@ -102,19 +113,21 @@ def __transaction_table(stats:AlgorithmTracker, n):
 
     stats.transactions = transactions
 
-def algoritm_t_offline(n):
-    stats = AlgorithmTracker()
+def algoritm_t_offline(vector, stats:AlgorithmTracker):
+    n = len(vector)
     __transaction_table(stats, n)
-    a = list(range(1, n + 1))
+    a = list(vector)
     stats.att_vector += n
     
     log_permutation(a)
 
     for (idx_i, idx_j) in stats.transactions:
-        a[idx_i], a[idx_j] = a[idx_j], a[idx_i]
+        temp = a[idx_i]
+        stats.att_local += 1 
+
+        a[idx_i] = a[idx_j]
+        a[idx_j] = temp
         stats.exchanges += 1
         stats.att_vector += 2 
         
         log_permutation(a)
-
-    return stats
