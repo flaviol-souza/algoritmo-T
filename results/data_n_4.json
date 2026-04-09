@@ -1,0 +1,22 @@
+{
+    "T online": {
+        "n!": 24,
+        "Compara\u00e7\u00f5es": 494,
+        "Atribui\u00e7\u00f5es Local": 229,
+        "Atribui\u00e7\u00f5es V": 129,
+        "Trocas": 23,
+        "Memoria": 3.90234375,
+        "Setup_ms": 0,
+        "Total_ms": 0.15745102427899837
+    },
+    "T offline": {
+        "n!": 24,
+        "Compara\u00e7\u00f5es": 0,
+        "Atribui\u00e7\u00f5es Local": 23,
+        "Atribui\u00e7\u00f5es V": 50,
+        "Trocas": 23,
+        "Memoria": 1.6640625,
+        "Setup_ms": 0.08699402678757906,
+        "Total_ms": 0.10109995491802692
+    }
+}
