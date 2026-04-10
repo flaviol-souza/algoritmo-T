@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import math
 import time
-import random
+import json
 import tracemalloc
 import gc
 import json
@@ -126,6 +126,49 @@ def plot_comparativo_recursos(n_list, metrics):
     plt.savefig('results/recursos.png')
     #plt.show()
 
+def export_to_web_report(all_data, filename="results"):
+    import json
+    # Estrutura compatível com o index.html anterior
+    web_data = {
+        "algorithm": "Comparativo P vs T",
+        "rows": []
+    }
+    
+    # Ordena os n para garantir que o gráfico fique correto
+    for n in sorted(all_data.keys()):
+        res = all_data[n]
+        web_data["rows"].append({
+            "n": n,
+            "p": {
+                "total": {
+                    "time_ms": res["P"]["Operation (ms)"],
+                    "comparisons": res["P"]["Comparações"],
+                    "local_assignments": res["P"]["Atrib. (Local)"],
+                    "vector_assignments": res["P"]["Atrib. (Vetor)"]
+                }
+            },
+            "t_online": {
+                "total": {
+                    "time_ms": res["T online"]["Operation (ms)"],
+                    "comparisons": res["T online"]["Comparações"],
+                    "local_assignments": res["T online"]["Atrib. (Local)"],
+                    "vector_assignments": res["T online"]["Atrib. (Vetor)"]
+                }
+            }
+        })
+
+    # 2. Salva o arquivo .json
+    json_path = f"{filename}.json"
+    with open(json_path, "w", encoding="utf-8") as f:
+        json.dump(web_data, f, indent=2)
+    print(f"Arquivo {json_path} gerado com sucesso.")
+
+    # 3. Salva o arquivo .js (Payload para o navegador)
+    js_path = f"{filename}.js"
+    with open(js_path, "w", encoding="utf-8") as f:
+        f.write(f"window.__ALGO_T_RESULTS__ = {json.dumps(web_data, indent=2)};")
+    print(f"Arquivo {js_path} gerado com sucesso.")
+
 def save_n_results(n, results):
     filename = os.path.join(RESULTS_DIR, f"data_n_{n}.json")
     # Se já existir, carregamos para adicionar o novo algoritmo
@@ -217,6 +260,7 @@ def generate_reports():
     print_tabelas_finais(n_list, data) 
     plot_results(n_list, formatted_metrics)
     plot_comparativo_recursos(n_list, formatted_metrics)
+    export_to_web_report(data)
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
