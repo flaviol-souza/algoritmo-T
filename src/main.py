@@ -12,17 +12,28 @@ from p import algoritmo_p
 from t import algoritm_t_online, algoritm_t_offline
 from tracker import AlgorithmTracker
 
+N = 'n'
+N_FAT = 'n!'
+SUF_TAB = '- Tab.'
+COMP = 'Comparações'
+COMP_TAB = COMP + ' ' + SUF_TAB
+ATTR_LOCAL = 'Atrib. (Local)'
+ATTR_LOCAL_TAB = ATTR_LOCAL + ' ' + SUF_TAB
+ATTR_VECTOR = 'Atrib. (Vetor)'
+ATTR_VECTOR_TAB = ATTR_VECTOR + ' ' + SUF_TAB
+EXCHANGES = 'Trocas'
+EXCHANGES_TAB = EXCHANGES + ' ' + SUF_TAB
+MEMORY = 'Memória (kb)'    
+TIME_SETUP = 'Setup (ms)'
+TIME_OPERATION = 'Operation (ms)'
+ 
+
 RESULTS_DIR = "results"
 os.makedirs(RESULTS_DIR, exist_ok=True)
 
-algoritms = {"T online": algoritm_t_online, "T offline": algoritm_t_offline}
+algoritms = {"P": algoritmo_p, "T online": algoritm_t_online, "T offline": algoritm_t_offline}
 
 def print_tabelas_finais(n_list, all_data):
-    """
-    Imprime as tabelas formatadas no terminal a partir dos dados consolidados nos JSONs.
-    Responde à provocação do professor sobre 'Setup vs Uso'.
-    """
-    # Identifica os algoritmos presentes nos dados (ex: T online, T offline, P)
     alg_names = all_data[n_list[0]].keys()
 
     for name in alg_names:
@@ -31,28 +42,26 @@ def print_tabelas_finais(n_list, all_data):
         print(header_line)
         
         # Cabeçalho com separação clara de métricas
-        print(f"{'n':<4} | {'n!':<10} | {'Comparacoes':<12} | {'Atrib. (Local)':<18} | {'Atrib. (Vetor)':<18} | {'Trocas':<8} | {'Memória (kb)':<15} | {'Setup (ms)':<15} | {'Uso Real (ms)':<15}")
+        print(f"{N:<4} | {N_FAT:<10} | {COMP:<12} | {ATTR_LOCAL:<18} | {ATTR_VECTOR:<18} | {EXCHANGES:<8} | {MEMORY:<15} | {TIME_SETUP:<15} | {TIME_OPERATION:<15}")
         print(header_line)
 
         for n in n_list:
             if name in all_data[n]:
                 res = all_data[n][name]
                 
-                # Cálculo dos tempos baseado na estrutura do JSON que definimos
-                setup_time = res.get("Setup_ms", 0.0)
-                total_time = res.get("Total_ms", 0.0)
-                # O Uso Real é o que sobra quando retiramos o tempo de construção
-                uso_real = total_time - setup_time
+                setup_time = res.get(TIME_SETUP, 0.0)
+                total_time = res.get(TIME_OPERATION, 0.0)
+                op_time = total_time - setup_time
                 
                 print(f"{n:<4} | "
-                      f"{res['n!']:<10} | "
-                      f"{res['Comparações']:<12} | "
-                      f"{res['Atribuições Local']:<18} | "
-                      f"{res['Atribuições V']:<18} | "
-                      f"{res['Trocas']:<8} | "
-                      f"{res['Memoria']:<15.2f} | "
+                      f"{res[N_FAT]:<10} | "
+                      f"{res[COMP]:<12} | "
+                      f"{res[ATTR_LOCAL]:<18} | "
+                      f"{res[ATTR_VECTOR]:<18} | "
+                      f"{res[EXCHANGES]:<8} | "
+                      f"{res[MEMORY]:<15.2f} | "
                       f"{setup_time:<15.4f} | "
-                      f"{uso_real:<15.4f}")
+                      f"{op_time:<15.4f}")
         
         print(header_line)
         
@@ -60,10 +69,22 @@ def plot_results(n_list, metrics):
     
     for alg, data in metrics.items():
         plt.figure(figsize=(10, 6))
-        plt.plot(n_list, data["Comparações"], label="Comparações", marker='o')
-        plt.plot(n_list, data["Atribuições Local"], label="Atribuições Locais", marker='s')
-        plt.plot(n_list, data["Atribuições V"], label="Atribuições Vetor", marker='s')
-        plt.plot(n_list, data["Trocas"], label="Trocas", marker='x')
+        
+        plt.plot(n_list, data[COMP], label=COMP, marker='o')
+        if data[COMP_TAB][0] > 0:
+            plt.plot(n_list, data[COMP_TAB], label=COMP_TAB, marker='o')
+        
+        plt.plot(n_list, data[ATTR_LOCAL], label=ATTR_LOCAL, marker='s')
+        if data[ATTR_LOCAL_TAB][0] > 0:
+            plt.plot(n_list, data[ATTR_LOCAL_TAB], label=ATTR_LOCAL_TAB, marker='s')
+        
+        plt.plot(n_list, data[ATTR_VECTOR], label=ATTR_VECTOR, marker='s')
+        if data[ATTR_VECTOR_TAB][0] > 0:
+            plt.plot(n_list, data[ATTR_VECTOR_TAB], label=ATTR_VECTOR_TAB, marker='s')
+
+        plt.plot(n_list, data[EXCHANGES], label=EXCHANGES, marker='x')
+        if data[EXCHANGES_TAB][0] > 0:
+            plt.plot(n_list, data[EXCHANGES_TAB], label=EXCHANGES_TAB, marker='>')
 
         plt.yscale('log') 
         plt.xlabel('n (Tamanho da entrada)')
@@ -78,27 +99,26 @@ def plot_comparativo_recursos(n_list, metrics):
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 6))
     
     for alg_name, data in metrics.items():
-        ax1.plot(n_list, data["Tempo"], label=f"{alg_name} (Uso)", marker='o')
-        
-        if "offline" in alg_name.lower():
-            ax1.plot(n_list, data["Temp. Tab."], label=f"{alg_name} (Setup)", 
-                     linestyle='--', alpha=0.7, marker='x')
-        
-        ax2.plot(n_list, data["Memoria"], label=alg_name, marker='s')
+        d = data[TIME_OPERATION]
+        #if "offline" in alg_name.lower():
+        #    d = data[TIME_SETUP]
+            
+        ax1.plot(n_list, d, label=f"{alg_name}", marker='o')
+        ax2.plot(n_list, data[MEMORY], label=alg_name, marker='s')
 
     # Configurações do gráfico de Tempo
     ax1.set_yscale('log')
     ax1.set_xlabel('n (Tamanho da entrada)')
-    ax1.set_ylabel('Tempo (ms) - Escala Log')
-    ax1.set_title('Comparativo de Tempo: Setup vs Uso')
+    ax1.set_ylabel('Tempo (ms)')
+    ax1.set_title('Comparativo de Tempo')
     ax1.legend()
     ax1.grid(True, which="both", ls="-", alpha=0.5)
 
     # Configurações do gráfico de Memória
     ax2.set_yscale('log')
     ax2.set_xlabel('n (Tamanho da entrada)')
-    ax2.set_ylabel('Pico de Memória (KB) - Escala Log')
-    ax2.set_title('Consumo de Memória (Pico)')
+    ax2.set_ylabel('Pico de Memória (KB)')
+    ax2.set_title('Consumo de Memória')
     ax2.legend()
     ax2.grid(True, which="both", ls="-", alpha=0.5)
 
@@ -130,9 +150,7 @@ def load_all_results():
     return all_data
 
 def run_benchmark(n):
-    vetor = list(range(1, n + 1))
-    #random.shuffle(vetor)
-    
+    vetor = list(range(1, n + 1))    
     results_for_n = {}
     
     for name, func in algoritms.items():
@@ -147,16 +165,19 @@ def run_benchmark(n):
         _, peak = tracemalloc.get_traced_memory()
         tracemalloc.stop()
         
-        # Guardamos os dados brutos
         results_for_n[name] = {
-            "n!": math.factorial(n),
-            "Comparações": tracker.comparisons,
-            "Atribuições Local": tracker.att_local,
-            "Atribuições V": tracker.att_vector,
-            "Trocas": tracker.exchanges,
-            "Memoria": peak / 1024,
-            "Setup_ms": tracker.duration_build_table_ms(),
-            "Total_ms": tracker.duration_ms()
+            N_FAT: math.factorial(n),
+            COMP: tracker.comparisons,
+            COMP_TAB: tracker.tab_comparisons,
+            ATTR_LOCAL: tracker.att_local,
+            ATTR_LOCAL_TAB: tracker.tab_att_local,
+            ATTR_VECTOR: tracker.att_vector,
+            ATTR_VECTOR_TAB: tracker.tab_att_vector,
+            EXCHANGES: tracker.exchanges,
+            EXCHANGES_TAB: tracker.tab_exchanges,
+            MEMORY: peak / 1024,
+            TIME_SETUP: tracker.duration_build_table_ms(),
+            TIME_OPERATION: tracker.duration_ms()
         }
     
     save_n_results(n, results_for_n)
@@ -169,29 +190,30 @@ def generate_reports():
         return
 
     n_list = sorted(data.keys())
-    
-    # Reorganiza para o formato que as suas funções de plot já usam
+        
     formatted_metrics = {}
     for name in algoritms.keys():
         formatted_metrics[name] = {
-            "Comparações": [], "Atribuições Local": [], "Atribuições V": [],
-            "Trocas": [], "Memoria": [], "Temp. Tab.": [], "Tempo": []
+            COMP: [], COMP_TAB: [], 
+            ATTR_LOCAL: [], ATTR_LOCAL_TAB: [], ATTR_VECTOR: [], ATTR_VECTOR_TAB: [],
+            EXCHANGES: [], EXCHANGES_TAB: [], MEMORY: [], TIME_SETUP: [], TIME_OPERATION: []
         }
 
     for n in n_list:
         for name in algoritms.keys():
             res = data[n][name]
-            formatted_metrics[name]["Comparações"].append(res["Comparações"])
-            formatted_metrics[name]["Atribuições Local"].append(res["Atribuições Local"])
-            formatted_metrics[name]["Atribuições V"].append(res["Atribuições V"])
-            formatted_metrics[name]["Trocas"].append(res["Trocas"])
-            formatted_metrics[name]["Memoria"].append(res["Memoria"])
-            formatted_metrics[name]["Temp. Tab."].append(res["Setup_ms"])
-            # Tempo puro de uso
-            formatted_metrics[name]["Tempo"].append(res["Total_ms"] - res["Setup_ms"])
+            formatted_metrics[name][COMP].append(res[COMP])
+            formatted_metrics[name][COMP_TAB].append(res[COMP_TAB])
+            formatted_metrics[name][ATTR_LOCAL].append(res[ATTR_LOCAL])
+            formatted_metrics[name][ATTR_LOCAL_TAB].append(res[ATTR_LOCAL_TAB])
+            formatted_metrics[name][ATTR_VECTOR].append(res[ATTR_VECTOR])
+            formatted_metrics[name][ATTR_VECTOR_TAB].append(res[ATTR_VECTOR_TAB])
+            formatted_metrics[name][EXCHANGES].append(res[EXCHANGES])
+            formatted_metrics[name][EXCHANGES_TAB].append(res[EXCHANGES_TAB])
+            formatted_metrics[name][MEMORY].append(res[MEMORY])
+            formatted_metrics[name][TIME_SETUP].append(res[TIME_SETUP])
+            formatted_metrics[name][TIME_OPERATION].append(res[TIME_OPERATION])
 
-    # Chama suas funções de plot e print existentes
-    # (Ajuste suas funções print_tabela para receber esses dados)
     print_tabelas_finais(n_list, data) 
     plot_results(n_list, formatted_metrics)
     plot_comparativo_recursos(n_list, formatted_metrics)

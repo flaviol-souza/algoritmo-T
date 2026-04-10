@@ -7,6 +7,12 @@ class AlgorithmTracker:
         self.att_vector = 0  #atribuicoes de vetor
         self.comparisons = 0   #comparacoes
         self.exchanges = 0     #trocas
+
+        self.tab_att_local = 0  #atribuicoes locais
+        self.tab_att_vector = 0  #atribuicoes de vetor
+        self.tab_comparisons = 0   #comparacoes
+        self.tab_exchanges = 0     #trocas
+
         self.permutations = 0  #permutacoes
         self.memory_peak_kb = 0.0
         

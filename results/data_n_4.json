@@ -1,22 +1,44 @@
 {
+    "P": {
+        "n!": 24,
+        "Compara\u00e7\u00f5es": 485,
+        "Compara\u00e7\u00f5es - Tab.": 0,
+        "Atrib. (Local)": 229,
+        "Atrib. (Local) - Tab.": 0,
+        "Atrib. (Vetor)": 107,
+        "Atrib. (Vetor) - Tab.": 0,
+        "Trocas": 23,
+        "Trocas - Tab.": 0,
+        "Mem\u00f3ria (kb)": 2.45703125,
+        "Setup (ms)": 0,
+        "Operation (ms)": 0.22735295351594687
+    },
     "T online": {
         "n!": 24,
         "Compara\u00e7\u00f5es": 494,
-        "Atribui\u00e7\u00f5es Local": 229,
-        "Atribui\u00e7\u00f5es V": 129,
+        "Compara\u00e7\u00f5es - Tab.": 0,
+        "Atrib. (Local)": 229,
+        "Atrib. (Local) - Tab.": 0,
+        "Atrib. (Vetor)": 129,
+        "Atrib. (Vetor) - Tab.": 0,
         "Trocas": 23,
-        "Memoria": 3.90234375,
-        "Setup_ms": 0,
-        "Total_ms": 0.15745102427899837
+        "Trocas - Tab.": 0,
+        "Mem\u00f3ria (kb)": 2.54296875,
+        "Setup (ms)": 0,
+        "Operation (ms)": 0.3820600686594844
     },
     "T offline": {
         "n!": 24,
         "Compara\u00e7\u00f5es": 0,
-        "Atribui\u00e7\u00f5es Local": 23,
-        "Atribui\u00e7\u00f5es V": 50,
+        "Compara\u00e7\u00f5es - Tab.": 416,
+        "Atrib. (Local)": 23,
+        "Atrib. (Local) - Tab.": 230,
+        "Atrib. (Vetor)": 50,
+        "Atrib. (Vetor) - Tab.": 129,
         "Trocas": 23,
-        "Memoria": 1.6640625,
-        "Setup_ms": 0.08699402678757906,
-        "Total_ms": 0.10109995491802692
+        "Trocas - Tab.": 23,
+        "Mem\u00f3ria (kb)": 1.69140625,
+        "Setup (ms)": 0.12193899601697922,
+        "Operation (ms)": 0.13504805974662304
     }
 }

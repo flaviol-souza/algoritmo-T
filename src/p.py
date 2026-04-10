@@ -1,8 +1,8 @@
 from tracker import log_permutation, AlgorithmTracker
 
-def algoritmo_p(n):
-    stats = AlgorithmTracker()
-    a = list(range(1, n + 1))
+def algoritmo_p(vector, stats:AlgorithmTracker):
+    n = len(vector)
+    a = list(vector)
     d = [-1] * n
     stats.att_vector += (n * 2) + 1
 

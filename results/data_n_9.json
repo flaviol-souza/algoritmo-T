@@ -1,22 +1,44 @@
 {
+    "P": {
+        "n!": 362880,
+        "Compara\u00e7\u00f5es": 17418223,
+        "Compara\u00e7\u00f5es - Tab.": 0,
+        "Atrib. (Local)": 5847583,
+        "Atrib. (Local) - Tab.": 0,
+        "Atrib. (Vetor)": 1497760,
+        "Atrib. (Vetor) - Tab.": 0,
+        "Trocas": 362879,
+        "Trocas - Tab.": 0,
+        "Mem\u00f3ria (kb)": 2.65234375,
+        "Setup (ms)": 0,
+        "Operation (ms)": 6291.903962031938
+    },
     "T online": {
         "n!": 362880,
         "Compara\u00e7\u00f5es": 17559351,
-        "Atribui\u00e7\u00f5es Local": 5847583,
-        "Atribui\u00e7\u00f5es V": 1860638,
+        "Compara\u00e7\u00f5es - Tab.": 0,
+        "Atrib. (Local)": 5847583,
+        "Atrib. (Local) - Tab.": 0,
+        "Atrib. (Vetor)": 1860638,
+        "Atrib. (Vetor) - Tab.": 0,
         "Trocas": 362879,
-        "Memoria": 22705.6953125,
-        "Setup_ms": 0,
-        "Total_ms": 6685.174413025379
+        "Trocas - Tab.": 0,
+        "Mem\u00f3ria (kb)": 22704.3359375,
+        "Setup (ms)": 0,
+        "Operation (ms)": 6425.55376002565
     },
     "T offline": {
         "n!": 362880,
         "Compara\u00e7\u00f5es": 0,
-        "Atribui\u00e7\u00f5es Local": 362879,
-        "Atribui\u00e7\u00f5es V": 725767,
+        "Compara\u00e7\u00f5es - Tab.": 14515191,
+        "Atrib. (Local)": 362879,
+        "Atrib. (Local) - Tab.": 5847584,
+        "Atrib. (Vetor)": 725767,
+        "Atrib. (Vetor) - Tab.": 1860638,
         "Trocas": 362879,
-        "Memoria": 22595.328125,
-        "Setup_ms": 927.9306170064956,
-        "Total_ms": 1224.8364289989695
+        "Trocas - Tab.": 362879,
+        "Mem\u00f3ria (kb)": 22595.4375,
+        "Setup (ms)": 6074.7786780120805,
+        "Operation (ms)": 6354.5446009375155
     }
 }
