@@ -308,7 +308,7 @@
     <section class="card">
       <h2>Comparison Graphs</h2>
       <p class="small">
-        Each chart shows one metric only, so the differences between T (Offline+Online total) and P stay readable.
+        Each chart shows one metric only, so the differences between T (Online/Offline) and P stay readable.
       </p>
       <div class="chart-grid">
         <article class="subcard">
@@ -411,7 +411,7 @@
 
     <section class="card">
       <h2>Final Results</h2>
-      <p class="small">Consolidated comparison table for P, T (Offline+Online total), T Offline, and T Online across all measured metrics.</p>
+      <p class="small">Consolidated comparison table for P, T (Online/Offline), T Offline, and T Online across all measured metrics.</p>
       <div style="overflow:auto;">
         <table id="final-results-table"></table>
       </div>
@@ -539,10 +539,9 @@
       const table = document.getElementById("final-results-table");
       const headers = [
         "n",
-        "P",
-        "T (Offline+Online)",
+        "T Online",
         "T Offline",
-        "T Online"
+        "P"
       ];
 
       const sections = [
@@ -550,40 +549,36 @@
           title: "Comparisons",
           key: "comparisons",
           pick: r => ({
-            p: r.p.total.comparisons,
-            tTotal: r.t.total.comparisons,
+            tOnline: r.t.online_algo.comparisons,
             tOffline: r.t.offline.comparisons,
-            tOnline: r.t.online_algo.comparisons
+            p: r.p.total.comparisons
           })
         },
         {
           title: "Local Variable Assignments",
           key: "local",
           pick: r => ({
-            p: r.p.total.local_assignments,
-            tTotal: r.t.total.local_assignments,
+            tOnline: r.t.online_algo.local_assignments,
             tOffline: r.t.offline.local_assignments,
-            tOnline: r.t.online_algo.local_assignments
+            p: r.p.total.local_assignments
           })
         },
         {
           title: "Vector Assignments",
           key: "vector",
           pick: r => ({
-            p: r.p.total.vector_assignments,
-            tTotal: r.t.total.vector_assignments,
-            tOffline: r.t.offline.vector_assignments,
-            tOnline: r.t.online_algo.vector_assignments
+            tOnline: r.t.online_algo.vector_assignments,
+            tOffline: r.t.offline.vector_assignments,  
+            p: r.p.total.vector_assignments
           })
         },
         {
           title: "Time (seconds)",
           key: "time",
-          pick: r => ({
-            p: r.p.total.time_seconds,
-            tTotal: r.t.total.time_seconds,
+          pick: r => ({            
+            tOnline: r.t.online_algo.time_seconds,
             tOffline: r.t.offline.time_seconds,
-            tOnline: r.t.online_algo.time_seconds
+            p: r.p.total.time_seconds
           })
         }
       ];
@@ -596,10 +591,9 @@
           const m = section.pick(r);
           html += "<tr>" + [
             r.n,
-            metricFmt(section.key, m.p),
-            metricFmt(section.key, m.tTotal),
+            metricFmt(section.key, m.tOnline),
             metricFmt(section.key, m.tOffline),
-            metricFmt(section.key, m.tOnline)
+            metricFmt(section.key, m.p)
           ].map(v => `<td>${v}</td>`).join("") + "</tr>";
         });
       });
