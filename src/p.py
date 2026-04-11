@@ -7,8 +7,8 @@ def algoritmo_p(vector, stats:AlgorithmTracker):
     stats.att_vector += (n * 2) + 1
 
     log_permutation(a)
-
-    stats.permutations = 1
+    stats.permutations += 1
+    
     while True:
         movivel = -1
         idx_movivel = -1
@@ -20,18 +20,22 @@ def algoritmo_p(vector, stats:AlgorithmTracker):
             stats.att_local += 1
             
             stats.comparisons += 1 
-            if 0 <= prox_idx < n:
-                stats.comparisons += 1 
-                if a[i] > a[prox_idx]:
-                    stats.comparisons += 1 
-                    if a[i] > movivel:
-                        movivel = a[i]
-                        idx_movivel = i
-                        stats.att_local += 2
-                        
+            if 0 <= prox_idx :
 
-        if idx_movivel == -1:
-            stats.comparisons += 1
+                stats.comparisons += 1 
+                if prox_idx < n:
+                
+                    stats.comparisons += 1 
+                    if a[i] > a[prox_idx]:
+
+                        stats.comparisons += 1 
+                        if a[i] > movivel:
+                            movivel = a[i]
+                            idx_movivel = i
+                            stats.att_local += 2
+                        
+        stats.comparisons += 1
+        if idx_movivel == -1:            
             break
 
         destino = idx_movivel + d[idx_movivel]
@@ -44,11 +48,9 @@ def algoritmo_p(vector, stats:AlgorithmTracker):
 
         for i in range(n):
             stats.comparisons += 1
-            stats.comparisons += 1
             if a[i] > movivel:
                 d[i] = -d[i]
                 stats.att_vector += 1
         
         stats.permutations += 1
         log_permutation(a)
-    return stats
