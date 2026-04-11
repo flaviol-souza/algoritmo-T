@@ -146,7 +146,7 @@
 
     .chart-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(520px, 1fr));
       gap: 12px;
     }
 
@@ -192,11 +192,18 @@
 <body>
   <main class="wrap">
     <section class="hero">
-      <h1>T Algorithm (Plain Changes)</h1>
+      <h1>Experimental Analysis of the T (Plain Changes) Algorithm</h1>
+      <h3>
+        <ul>
+          <li>CT-208 Computer Mathematics (ITA) - Prof. Luiz Mirizola</li>
+          <li>Authors: Flavio Souza and Nilson Sandy</li>
+        </ul>
+      </h3>
       <p>
-        Visualization of the Offline and Online phases for n=3..10. The Offline phase precomputes
-        an adjacent-swap plan; the Online phase applies it to generate permutations.
+        Unlike the classic lexicographic algorithm, which may require rearranging large blocks of the vector, Algorithm T focuses on the simplicity of the movement. 
+        Its premise is elegant: each new permutation is generated from the previous one through a single adjacent change (swapping two neighboring elements).
       </p>
+      <p>This characteristic defines it as a <b>"minimal change"</b> algorithm, ideal for systems where the cost of changing the state must be kept to a minimum.</p>
     </section>
 
     <section class="grid">
@@ -215,69 +222,73 @@
         The online phase reuses that plan to generate permutations quickly.
       </p>
 
-      <h3>Simple Pseudocode</h3>
-      <pre style="overflow:auto; background:#fff; border:1px solid #ebe2d6; border-radius:12px; padding:14px; line-height:1.45; white-space:pre-wrap; margin:0 0 12px;">T_ONLINE(vector):
-  # Goal: generate permutations directly, finding the mobile element at each step.
-  a <- copy(vector)
-  d <- [-1, ..., -1]
-  output a
+      <h3>Online T - Pseudocode</h3>
+      <pre style="overflow:auto; background:#fff; border:1px solid #ebe2d6; border-radius:12px; padding:14px; line-height:1.45; white-space:pre-wrap; margin:0 0 12px;">
+        T_ONLINE(vector):
+          # Goal: generate permutations directly, finding the mobile element at each step.
+          a <- copy(vector)
+          d <- [-1, ..., -1]
+          output a
 
-  while true:
-    # Block 1: search the largest mobile element and its index.
-    mobile <- -1
-    idx_mobile <- -1
+          while true:
+            # Block 1: search the largest mobile element and its index.
+            mobile <- -1
+            idx_mobile <- -1
 
-    for i in 0..n-1:
-      prox <- i + d[i]
-      if 0 <= prox < n and a[i] > a[prox] and a[i] > mobile:
-        mobile <- a[i]
-        idx_mobile <- i
+            for i in 0..n-1:
+              prox <- i + d[i]
+              if 0 <= prox < n and a[i] > a[prox] and a[i] > mobile:
+                mobile <- a[i]
+                idx_mobile <- i
 
-    # Block 2: stop condition when no mobile element exists.
-    if idx_mobile == -1: break
+            # Block 2: stop condition when no mobile element exists.
+            if idx_mobile == -1: break
 
-    # Block 3: perform the adjacent swap and keep direction aligned.
-    destination <- idx_mobile + d[idx_mobile]
-    record (idx_mobile, destination)
-    swap a[idx_mobile], a[destination]
-    swap d[idx_mobile], d[destination]
+            # Block 3: perform the adjacent swap and keep direction aligned.
+            destination <- idx_mobile + d[idx_mobile]
+            record (idx_mobile, destination)
+            swap a[idx_mobile], a[destination]
+            swap d[idx_mobile], d[destination]
 
-    # Block 4: reverse direction of elements larger than the moved mobile.
-    for i in 0..n-1:
-      if a[i] > mobile:
-        d[i] <- -d[i]
+            # Block 4: reverse direction of elements larger than the moved mobile.
+            for i in 0..n-1:
+              if a[i] > mobile:
+                d[i] <- -d[i]
 
-    output a
+            output a
+      </pre>
+      <h3>Offline T - Pseudocode</h3>
+      <pre style="overflow:auto; background:#fff; border:1px solid #ebe2d6; border-radius:12px; padding:14px; line-height:1.45; white-space:pre-wrap; margin:0 0 12px;">
+        TRANSACTION_TABLE(n):
+          # Goal: precompute only the swap indices (transaction list), not full permutations.
+          run the same mobile-element loop above over a <- [1..n]
+          store only each (idx_mobile, prox) in transactions
+          return transactions
 
-TRANSACTION_TABLE(n):
-  # Goal: precompute only the swap indices (transaction list), not full permutations.
-  run the same mobile-element loop above over a <- [1..n]
-  store only each (idx_mobile, prox) in transactions
-  return transactions
+        T_OFFLINE(vector):
+          # Goal: execute fast using the precomputed transaction list.
+          transactions <- TRANSACTION_TABLE(n)
+          a <- copy(vector)
+          output a
 
-T_OFFLINE(vector):
-  # Goal: execute fast using the precomputed transaction list.
-  transactions <- TRANSACTION_TABLE(n)
-  a <- copy(vector)
-  output a
-
-  # Block: replay each adjacent swap to enumerate all permutations.
-  for each (i, j) in transactions:
-    swap a[i], a[j]
-    output a</pre>
+          # Block: replay each adjacent swap to enumerate all permutations.
+          for each (i, j) in transactions:
+            swap a[i], a[j]
+            output a
+      </pre>
 
       <div class="grid">
         <article class="subcard">
-          <h3>Offline Function</h3>
+          <h3>Offline Version</h3>
           <p class="chart-desc">
-            This function prepares the swap plan. It finds which adjacent positions must be swapped
+            This version prepares the swap plan. It finds which adjacent positions must be swapped
             to move from one permutation to the next. The result is a compact roadmap.
           </p>
         </article>
         <article class="subcard">
-          <h3>Online Function</h3>
+          <h3>Online Version</h3>
           <p class="chart-desc">
-            This function receives the precomputed plan and applies each swap in order. It does not
+            This version receives the precomputed plan and applies each swap in order. It does not
             recompute the logic of the next move; it only follows the plan.
           </p>
         </article>
@@ -302,11 +313,12 @@ T_OFFLINE(vector):
       <div class="chart-grid">
         <article class="subcard">
           <h3>Comparisons</h3>
-          <p class="chart-desc">Number of comparisons performed by T (Offline+Online total) and P for each n.</p>
+          <p class="chart-desc">Number of comparisons performed by T (Offline/Online total) and P for each n.</p>
           <canvas id="comparisons-chart" class="chart" width="700" height="280"></canvas>
           <div class="chart-legend">
-            <span class="legend-item"><span class="dot" style="background:var(--line-a)"></span>T (Offline+Online)</span>
-            <span class="legend-item"><span class="dot" style="background:var(--line-b)"></span>P</span>
+            <span class="legend-item"><span class="dot" style="background:var(--line-a)"></span>T Online</span>
+            <span class="legend-item"><span class="dot" style="background:var(--line-b)"></span>T Offline</span>
+            <span class="legend-item"><span class="dot" style="background:var(--line-c)"></span>P</span>            
           </div>
         </article>
         <article class="subcard">
@@ -314,8 +326,9 @@ T_OFFLINE(vector):
           <p class="chart-desc">Assignments to loop counters, indexes, and other local variables.</p>
           <canvas id="locals-chart" class="chart" width="700" height="280"></canvas>
           <div class="chart-legend">
-            <span class="legend-item"><span class="dot" style="background:var(--line-a)"></span>T (Offline+Online)</span>
-            <span class="legend-item"><span class="dot" style="background:var(--line-b)"></span>P</span>
+            <span class="legend-item"><span class="dot" style="background:var(--line-a)"></span>T Online</span>
+            <span class="legend-item"><span class="dot" style="background:var(--line-b)"></span>T Offline</span>
+            <span class="legend-item"><span class="dot" style="background:var(--line-c)"></span>P</span>
           </div>
         </article>
         <article class="subcard">
@@ -323,8 +336,9 @@ T_OFFLINE(vector):
           <p class="chart-desc">Actual data movement in the permutation vector and the swap plan.</p>
           <canvas id="vector-chart" class="chart" width="700" height="280"></canvas>
           <div class="chart-legend">
-            <span class="legend-item"><span class="dot" style="background:var(--line-a)"></span>T (Offline+Online)</span>
-            <span class="legend-item"><span class="dot" style="background:var(--line-b)"></span>P</span>
+            <span class="legend-item"><span class="dot" style="background:var(--line-a)"></span>T Online</span>
+            <span class="legend-item"><span class="dot" style="background:var(--line-b)"></span>T Offline</span>
+            <span class="legend-item"><span class="dot" style="background:var(--line-c)"></span>P</span>
           </div>
         </article>
         <article class="subcard">
@@ -332,8 +346,9 @@ T_OFFLINE(vector):
           <p class="chart-desc">Total execution time in seconds. Uses a logarithmic Y axis because values grow very quickly.</p>
           <canvas id="time-chart" class="chart" width="700" height="280"></canvas>
           <div class="chart-legend">
-            <span class="legend-item"><span class="dot" style="background:var(--line-a)"></span>T (Offline+Online)</span>
-            <span class="legend-item"><span class="dot" style="background:var(--line-b)"></span>P</span>
+            <span class="legend-item"><span class="dot" style="background:var(--line-a)"></span>T Online</span>
+            <span class="legend-item"><span class="dot" style="background:var(--line-b)"></span>T Offline</span>
+            <span class="legend-item"><span class="dot" style="background:var(--line-c)"></span>P</span>
           </div>
         </article>
       </div>
@@ -347,19 +362,37 @@ T_OFFLINE(vector):
           <h3>Time Ratio: T / P</h3>
           <p class="chart-desc">Values below 1 mean T (Offline+Online) is faster than P.</p>
           <canvas id="time-ratio-chart" class="chart" width="700" height="280"></canvas>
+          <div class="chart-legend">
+            <span class="legend-item"><span class="dot" style="background:var(--line-a)"></span>T Online / P</span>
+            <span class="legend-item"><span class="dot" style="background:var(--line-b)"></span>T Offline / P</span>
+          </div>
         </article>
         <article class="subcard">
           <h3>Memory Ratio: T / P</h3>
           <p class="chart-desc">How many times more memory T (Offline+Online) uses versus P.</p>
           <canvas id="memory-ratio-chart" class="chart" width="700" height="280"></canvas>
+          <div class="chart-legend">
+            <span class="legend-item"><span class="dot" style="background:var(--line-a)"></span>T Online / P</span>
+            <span class="legend-item"><span class="dot" style="background:var(--line-b)"></span>T Offline / P</span>
+          </div>
         </article>
         <article class="subcard">
           <h3>Time vs Memory Frontier</h3>
           <p class="chart-desc">Each point is one n. Y is time (s), X is memory (KB), both in log scale.</p>
-          <canvas id="frontier-chart" class="chart" width="700" height="280"></canvas>
+          <canvas id="frontier-chart-online" class="chart" width="700" height="280"></canvas>
           <div class="chart-legend">
-            <span class="legend-item"><span class="dot" style="background:var(--line-a)"></span>T (Offline+Online)</span>
-            <span class="legend-item"><span class="dot" style="background:var(--line-b)"></span>P</span>
+            <span class="legend-item"><span class="dot" style="background:var(--line-a)"></span>T Online</span>
+            <span class="legend-item"><span class="dot" style="background:var(--line-c)"></span>P</span>
+            <span class="legend-item"><span class="dot" style="background:#9a5f2f"></span>1 GB limit</span>
+          </div>
+        </article>
+        <article class="subcard">
+          <h3>Time vs Memory Frontier</h3>
+          <p class="chart-desc">Each point is one n. Y is time (s), X is memory (KB), both in log scale.</p>
+          <canvas id="frontier-chart-offline" class="chart" width="700" height="280"></canvas>
+          <div class="chart-legend">
+            <span class="legend-item"><span class="dot" style="background:var(--line-b)"></span>T Offline</span>
+            <span class="legend-item"><span class="dot" style="background:var(--line-c)"></span>P</span>
             <span class="legend-item"><span class="dot" style="background:#9a5f2f"></span>1 GB limit</span>
           </div>
         </article>
@@ -823,6 +856,223 @@ T_OFFLINE(vector):
       ctx.fillText("time (s, log10)", 6, pad.top - 4);
     }
 
+    function drawFrontierChartOffline(canvasId, rows, memoryLimitKb) {
+      const canvas = document.getElementById(canvasId);
+      const ctx = canvas.getContext("2d");
+      const w = canvas.width;
+      const h = canvas.height;
+      const pad = { left: 72, right: 16, top: 18, bottom: 40 };
+
+      const tPoints = rows.map(r => ({ n: r.n, x: r.t.offline.memory_kb, y: r.t.offline.time_seconds }));
+      const pPoints = rows.map(r => ({ n: r.n, x: r.p.total.memory_kb, y: r.p.total.time_seconds }));
+      const all = tPoints.concat(pPoints).filter(p => p.x > 0 && p.y > 0);
+      if (!all.length) return;
+
+      const minX = Math.min(...all.map(p => p.x));
+      const maxX = Math.max(...all.map(p => p.x));
+      const minY = Math.min(...all.map(p => p.y));
+      const maxY = Math.max(...all.map(p => p.y));
+
+      const xMinPow = Math.floor(Math.log10(minX));
+      const xMaxPow = Math.ceil(Math.log10(maxX));
+      const yMinPow = Math.floor(Math.log10(minY));
+      const yMaxPow = Math.ceil(Math.log10(maxY));
+
+      const xToPx = x => {
+        const p = (Math.log10(Math.max(x, minX)) - xMinPow) / Math.max(1, xMaxPow - xMinPow);
+        return pad.left + p * (w - pad.left - pad.right);
+      };
+
+      const yToPx = y => {
+        const p = (Math.log10(Math.max(y, minY)) - yMinPow) / Math.max(1, yMaxPow - yMinPow);
+        return h - pad.bottom - p * (h - pad.top - pad.bottom);
+      };
+
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = "#fff";
+      ctx.fillRect(0, 0, w, h);
+
+      ctx.strokeStyle = "#d9d1c4";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(pad.left, pad.top);
+      ctx.lineTo(pad.left, h - pad.bottom);
+      ctx.lineTo(w - pad.right, h - pad.bottom);
+      ctx.stroke();
+
+      for (let p = xMinPow; p <= xMaxPow; p += 1) {
+        const val = Math.pow(10, p);
+        const x = xToPx(val);
+        ctx.strokeStyle = "#efe6db";
+        ctx.beginPath();
+        ctx.moveTo(x, pad.top);
+        ctx.lineTo(x, h - pad.bottom);
+        ctx.stroke();
+      }
+
+      for (let p = yMinPow; p <= yMaxPow; p += 1) {
+        const val = Math.pow(10, p);
+        const y = yToPx(val);
+        ctx.strokeStyle = "#efe6db";
+        ctx.beginPath();
+        ctx.moveTo(pad.left, y);
+        ctx.lineTo(w - pad.right, y);
+        ctx.stroke();
+      }
+
+      const drawSeries = (points, color) => {
+        ctx.strokeStyle = color;
+        ctx.fillStyle = color;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        points.forEach((pt, idx) => {
+          const x = xToPx(pt.x);
+          const y = yToPx(pt.y);
+          if (idx === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        });
+        ctx.stroke();
+
+        points.forEach(pt => {
+          const x = xToPx(pt.x);
+          const y = yToPx(pt.y);
+          ctx.beginPath();
+          ctx.arc(x, y, 3, 0, 2 * Math.PI);
+          ctx.fill();
+          ctx.font = "10px Trebuchet MS";
+          ctx.fillText(String(pt.n), x + 4, y - 4);
+        });
+      };
+
+      drawSeries(tPoints, getColorVar("--line-b"));
+      drawSeries(pPoints, getColorVar("--line-c"));
+
+      if (memoryLimitKb > 0) {
+        const xLimit = xToPx(memoryLimitKb);
+        ctx.strokeStyle = "#9a5f2f";
+        ctx.setLineDash([6, 5]);
+        ctx.beginPath();
+        ctx.moveTo(xLimit, pad.top);
+        ctx.lineTo(xLimit, h - pad.bottom);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+
+      ctx.fillStyle = "#45515d";
+      ctx.font = "11px Trebuchet MS";
+      ctx.fillText("memory (KB, log10)", w - pad.right - 108, h - 8);
+      ctx.fillText("time (s, log10)", 6, pad.top - 4);
+    }
+
+    function drawFrontierChartOnline(canvasId, rows, memoryLimitKb) {
+      const canvas = document.getElementById(canvasId);
+      const ctx = canvas.getContext("2d");
+      const w = canvas.width;
+      const h = canvas.height;
+      const pad = { left: 72, right: 16, top: 18, bottom: 40 };
+
+      const tPoints = rows.map(r => ({ n: r.n, x: r.t.online.memory_kb, y: r.t.online.time_seconds }));
+      const pPoints = rows.map(r => ({ n: r.n, x: r.p.total.memory_kb, y: r.p.total.time_seconds }));
+      const all = tPoints.concat(pPoints).filter(p => p.x > 0 && p.y > 0);
+      if (!all.length) return;
+
+      const minX = Math.min(...all.map(p => p.x));
+      const maxX = Math.max(...all.map(p => p.x));
+      const minY = Math.min(...all.map(p => p.y));
+      const maxY = Math.max(...all.map(p => p.y));
+
+      const xMinPow = Math.floor(Math.log10(minX));
+      const xMaxPow = Math.ceil(Math.log10(maxX));
+      const yMinPow = Math.floor(Math.log10(minY));
+      const yMaxPow = Math.ceil(Math.log10(maxY));
+
+      const xToPx = x => {
+        const p = (Math.log10(Math.max(x, minX)) - xMinPow) / Math.max(1, xMaxPow - xMinPow);
+        return pad.left + p * (w - pad.left - pad.right);
+      };
+
+      const yToPx = y => {
+        const p = (Math.log10(Math.max(y, minY)) - yMinPow) / Math.max(1, yMaxPow - yMinPow);
+        return h - pad.bottom - p * (h - pad.top - pad.bottom);
+      };
+
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = "#fff";
+      ctx.fillRect(0, 0, w, h);
+
+      ctx.strokeStyle = "#d9d1c4";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(pad.left, pad.top);
+      ctx.lineTo(pad.left, h - pad.bottom);
+      ctx.lineTo(w - pad.right, h - pad.bottom);
+      ctx.stroke();
+
+      for (let p = xMinPow; p <= xMaxPow; p += 1) {
+        const val = Math.pow(10, p);
+        const x = xToPx(val);
+        ctx.strokeStyle = "#efe6db";
+        ctx.beginPath();
+        ctx.moveTo(x, pad.top);
+        ctx.lineTo(x, h - pad.bottom);
+        ctx.stroke();
+      }
+
+      for (let p = yMinPow; p <= yMaxPow; p += 1) {
+        const val = Math.pow(10, p);
+        const y = yToPx(val);
+        ctx.strokeStyle = "#efe6db";
+        ctx.beginPath();
+        ctx.moveTo(pad.left, y);
+        ctx.lineTo(w - pad.right, y);
+        ctx.stroke();
+      }
+
+      const drawSeries = (points, color) => {
+        ctx.strokeStyle = color;
+        ctx.fillStyle = color;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        points.forEach((pt, idx) => {
+          const x = xToPx(pt.x);
+          const y = yToPx(pt.y);
+          if (idx === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        });
+        ctx.stroke();
+
+        points.forEach(pt => {
+          const x = xToPx(pt.x);
+          const y = yToPx(pt.y);
+          ctx.beginPath();
+          ctx.arc(x, y, 3, 0, 2 * Math.PI);
+          ctx.fill();
+          ctx.font = "10px Trebuchet MS";
+          ctx.fillText(String(pt.n), x + 4, y - 4);
+        });
+      };
+
+      drawSeries(tPoints, getColorVar("--line-a"));
+      drawSeries(pPoints, getColorVar("--line-c"));
+
+      if (memoryLimitKb > 0) {
+        const xLimit = xToPx(memoryLimitKb);
+        ctx.strokeStyle = "#9a5f2f";
+        ctx.setLineDash([6, 5]);
+        ctx.beginPath();
+        ctx.moveTo(xLimit, pad.top);
+        ctx.lineTo(xLimit, h - pad.bottom);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+
+      ctx.fillStyle = "#45515d";
+      ctx.font = "11px Trebuchet MS";
+      ctx.fillText("memory (KB, log10)", w - pad.right - 108, h - 8);
+      ctx.fillText("time (s, log10)", 6, pad.top - 4);
+    }
+
+
     function computeTurningPoint(rows, memoryLimitKb) {
       for (const r of rows) {
         const tMem = Number(r.t.total.memory_kb || 0);
@@ -914,8 +1164,8 @@ T_OFFLINE(vector):
       drawMetricChart(
         "time-ratio-chart",
         turningRows,
-        [r => r.t.total.time_seconds / Math.max(r.p.total.time_seconds, 1e-12)],
-        ["T/P"],
+        [r => r.t.online.time_seconds / Math.max(r.p.total.time_seconds, 1e-12), r => r.t.offline.time_seconds / Math.max(r.p.total.time_seconds, 1e-12)],
+        ["T Online/P", "T Offline/P"],
         "ratio",
         {
           markerN: turningN,
@@ -926,8 +1176,8 @@ T_OFFLINE(vector):
       drawMetricChart(
         "memory-ratio-chart",
         turningRows,
-        [r => r.t.total.memory_kb / Math.max(r.p.total.memory_kb, 1e-12)],
-        ["T/P"],
+        [r => r.t.online.memory_kb / Math.max(r.p.total.memory_kb, 1e-12), r => r.t.offline.memory_kb / Math.max(r.p.total.memory_kb, 1e-12)],
+        ["T Online/P", "T Offline/P"],
         "ratio",
         {
           logY: true,
@@ -936,7 +1186,8 @@ T_OFFLINE(vector):
         }
       );
 
-      drawFrontierChart("frontier-chart", turningRows, memoryLimitKb);
+      drawFrontierChartOnline("frontier-chart-online", turningRows, memoryLimitKb);
+      drawFrontierChartOffline("frontier-chart-offline", turningRows, memoryLimitKb);
     }
 
     function animateSample(sample) {
@@ -962,7 +1213,7 @@ T_OFFLINE(vector):
         i += 1;
       };
       show();
-      timerId = setInterval(show, 600);
+      timerId = setInterval(show, 1500);
     }
 
     function generateFirstPermutationsTOnline(n) {
@@ -1105,29 +1356,29 @@ T_OFFLINE(vector):
       drawMetricChart(
         "comparisons-chart",
         data.rows,
-        [r => r.t.total.comparisons, r => r.p.total.comparisons],
-        ["T (Offline+Online)", "P"],
+        [r => r.t.online.comparisons, r => r.t.offline.comparisons, r => r.p.total.comparisons],
+        ["T Online", "T Offline", "P"],
         "comparisons"
       );
       drawMetricChart(
         "locals-chart",
         data.rows,
-        [r => r.t.total.local_assignments, r => r.p.total.local_assignments],
-        ["T (Offline+Online)", "P"],
+        [r => r.t.online.local_assignments, r => r.t.offline.local_assignments, r => r.p.total.local_assignments],     
+        ["T Online", "T Offline", "P"],
         "local assignments"
       );
       drawMetricChart(
         "vector-chart",
         data.rows,
-        [r => r.t.total.vector_assignments, r => r.p.total.vector_assignments],
-        ["T (Offline+Online)", "P"],
+        [r => r.t.online.vector_assignments, r => r.t.offline.vector_assignments, r => r.p.total.vector_assignments],
+        ["T Online", "T Offline", "P"],
         "vector assignments"
       );
       drawMetricChart(
         "time-chart",
         data.rows,
-        [r => r.t.total.time_seconds, r => r.p.total.time_seconds],
-        ["T (Offline+Online)", "P"],
+        [r => r.t.online.time_seconds, r => r.t.offline.time_seconds, r => r.p.total.time_seconds],
+        ["T Online", "T Offline", "P"],
         "seconds (log10)",
         { logY: true }
       );
