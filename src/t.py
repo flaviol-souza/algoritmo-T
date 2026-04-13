@@ -8,8 +8,6 @@ def algoritm_t_online(vector, stats:AlgorithmTracker):
     d = [-1] * n
     c = [0] * n
     stats.att_vector += (n * 3) +1
-
-    stats.transactions = []
     stats.att_local += 1
 
     log_permutation(a)
@@ -23,9 +21,6 @@ def algoritm_t_online(vector, stats:AlgorithmTracker):
         stats.comparisons += 1
         if c[i] < i:
 
-            #idx_1 = i - c[i] + (1 if d[i] == 1 else -1)
-            #stats.att_local += 1
-
             target = a.index(i + 1)
             neighbor = target + d[target]
             stats.att_local += 2
@@ -33,8 +28,6 @@ def algoritm_t_online(vector, stats:AlgorithmTracker):
             a[target], a[neighbor] = a[neighbor], a[target]
             stats.exchanges += 1
             stats.att_vector += 2
-
-            stats.transactions.append((target, neighbor))
 
             c[i] += 1
             stats.att_vector += 1
@@ -93,14 +86,14 @@ def __transaction_table(stats:AlgorithmTracker, n):
             i += 1
             stats.tab_att_local += 2
         
-    stats.transactions = transactions
+    return transactions
 
 def algoritm_t_offline(vector, stats:AlgorithmTracker):
     n = len(vector)
     stats.att_vector += 1
     
     stats.start_build_table_time = time.perf_counter()
-    __transaction_table(stats, n)
+    transactions = __transaction_table(stats, n)
     stats.end_build_table_time = time.perf_counter()
 
     a = list(vector)
@@ -109,7 +102,7 @@ def algoritm_t_offline(vector, stats:AlgorithmTracker):
     stats.permutations += 1
     log_permutation(a)
 
-    for (idx_i, idx_j) in stats.transactions:
+    for (idx_i, idx_j) in transactions:
         temp = a[idx_i]
         stats.att_local += 1 
 

@@ -205,13 +205,33 @@
       </p>
       <p>This characteristic defines it as a <b>"minimal change"</b> algorithm, ideal for systems where the cost of changing the state must be kept to a minimum.</p>
     </section>
+    <section class="hero">
+      <h2>Fundamentação Teórica: O Grupo de Permutações e a Ordem de SJT</h2>
+      
+      <p>
+          A geração de permutações é um problema central na matemática computacional, fundamentado na teoria de grupos, onde o conjunto de todas as permutações de <em>n</em> elementos forma o <strong>Grupo Simétrico <em>Sn</em></strong>. 
+          Tradicionalmente, algoritmos lexicográficos exigem rearranjos estruturais complexos, mas a classe de algoritmos de <strong>Mudanças Mínimas (Plain Changes)</strong> busca uma <a href="https://upload.wikimedia.org/wikipedia/commons/7/78/Symmetric_group_4%3B_Cayley_graph_1%2C2%2C6_%283D%29%3B_Steinhaus%E2%80%93Johnson%E2%80%93Trotter.svg" target="_blank">trajetória hamiltoniana no grafo de Cayley</a>, onde cada vértice (permutação) é alcançado através de uma única transposição adjacente.
+      </p>
+      </br>   
+      <p>
+          O <strong>Algoritmo T</strong> apresenta-se como uma <strong>implementação otimizada e melhorada do Algoritmo P</strong> (Steinhaus-Johnson-Trotter). Enquanto o Algoritmo P baseia-se na busca exaustiva do maior elemento móvel e na atualização global de vetores de direção em cada passo, o Algoritmo T refina esse processo ao focar na <em>transição</em>. 
+      </p>
+    
+      <p>
+          Essa evolução permite que o Algoritmo T opere em duas frentes distintas:
+          <ul>
+              <li><strong>Modo Online:</strong> Onde as transições são calculadas <em>Just-In-Time</em>, mantendo um estado de memória reduzido ($O(n)$).</li>
+              <li><strong>Modo Offline:</strong> Onde a inteligência do Algoritmo P é utilizada para pré-calcular uma <strong>Tabela de Transações</strong>, permitindo que a geração subsequente ocorra em tempo constante ($O(1)$) por permutação, eliminando completamente a latência de decisão algorítmica.</li>
+          </ul>
+      </p>
+  </section>
 
     <section class="grid">
       <article class="card sample-box">
-        <h2>Didactic Example (Online)</h2>
+        <h2>Exemplo - T Online</h2>
         <div id="sample-meta" class="small"></div>
         <div id="perm-view" class="perm">-</div>
-        <div class="small">At each step, only one adjacent pair changes.</div>
+        <div class="small">A cada passo, apenas um par adjacente muda.</div>
       </article>
     </section>
 
@@ -222,76 +242,84 @@
         The online phase reuses that plan to generate permutations quickly.
       </p>
 
-      <h3>Online T - Pseudocode</h3>
-      <pre style="overflow:auto; background:#fff; border:1px solid #ebe2d6; border-radius:12px; padding:14px; line-height:1.45; white-space:pre-wrap; margin:0 0 12px;">
-        T_ONLINE(vector):
-          # Goal: generate permutations directly, finding the mobile element at each step.
-          a <- copy(vector)
-          d <- [-1, ..., -1]
-          output a
+      <h3>Pseudocode - T Online</h3>
+      <div style="background: #fff; padding: 15px; border-radius: 8px; border-left: 4px solid #d35400; font-family: 'Fira Code', monospace; color: #2c3e50; line-height: 1.5;">
+        <span style="color: #7f8c8d;"># Inicialização do Estado de Controle</span><br>
+        <strong>c</strong> ← [0, ..., 0] <span style="color: #7f8c8d;"># Contadores de "movimento" para cada nível</span><br>
+        <strong>d</strong> ← [-1, ..., -1] <span style="color: #7f8c8d;"># Bússola para mudanças adjacentes</span><br>
+        <strong>i</strong> ← 0<br><br>
 
-          while true:
-            # Block 1: search the largest mobile element and its index.
-            mobile <- -1
-            idx_mobile <- -1
+        <span style="color: #c0392b;"><strong>enquanto</strong></span> (i < n):<br>
+        
+        <div style="padding-left: 25px;">
+            <span style="color: #c0392b;"><strong>se</strong></span> (c[i] < i):<br>
+            <div style="padding-left: 20px; border-left: 2px solid #eee;">
+                <span style="color: #7f8c8d;"># 1. Localização e Troca (Onde o custo Online ocorre)</span><br>
+                <strong>alvo</strong> ← encontrar_indice(i + 1) <span style="color: #7f8c8d;"># Busca O(n)</span><br>
+                <strong>vizinho</strong> ← alvo + d[alvo]<br>
+                <strong>trocar</strong>(a[alvo], a[vizinho])<br><br>
 
-            for i in 0..n-1:
-              prox <- i + d[i]
-              if 0 <= prox < n and a[i] > a[prox] and a[i] > mobile:
-                mobile <- a[i]
-                idx_mobile <- i
+                <span style="color: #7f8c8d;"># 2. Atualização do Contador e Reset do Ponteiro</span><br>
+                <strong>c[i]</strong> ← c[i] + 1<br>
+                <strong>i</strong> ← 0 <span style="color: #7f8c8d;"># Reinicia para garantir a menor troca disponível</span><br>
+            </div>
+            
+            <span style="color: #c0392b;"><strong>senão</strong></span>:<br>
+            <div style="padding-left: 20px; border-left: 2px solid #eee;">
+                <span style="color: #7f8c8d;"># 3. Inversão de Direção e Subida de Nível</span><br>
+                <strong>d[i]</strong> ← -d[i]<br>
+                <strong>c[i]</strong> ← 0<br>
+                <strong>i</strong> ← i + 1<br>
+            </div>
+        </div>
+      </div>
+      
+      <h3>Pseudocode - T Offline</h3>
 
-            # Block 2: stop condition when no mobile element exists.
-            if idx_mobile == -1: break
+      <div style="background: #fff; border: 1px solid #cfd8dc; border-radius: 12px; padding: 20px; font-family: 'Fira Code', monospace; color: #263238; line-height: 1.5;">
+          <div style="background: #f4f7f6; padding: 15px; border-radius: 8px; border-left: 4px solid #2980b9; margin-bottom: 20px;">
+              <span style="color: #7f8c8d;"># FASE 1: Geração da Tabela de Transições (Setup)</span><br>
+              <strong>CONSTRUIR_TABELA(n):</strong><br>
+              <div style="padding-left: 25px;">
+                  <strong>plano</strong> ← [ ] <span style="color: #7f8c8d;"># Lista de tuplas (i, j)</span><br>
+                  Executar lógica do <strong>T_Online</strong> sobre vetor [1..n]<br>
+                  <strong>Para cada</strong> troca identificada entre índices <strong>i</strong> e <strong>j</strong>:<br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;Adicionar (i, j) ao <strong>plano</strong><br>
+                  <strong>retornar</strong> plano
+              </div>
+          </div>
 
-            # Block 3: perform the adjacent swap and keep direction aligned.
-            destination <- idx_mobile + d[idx_mobile]
-            record (idx_mobile, destination)
-            swap a[idx_mobile], a[destination]
-            swap d[idx_mobile], d[destination]
+          <div style="background: #eef2f3; padding: 15px; border-radius: 8px; border-left: 4px solid #27ae60;">
+              <span style="color: #7f8c8d;"># FASE 2: Execução de Alta Performance (Uso Real)</span><br>
+              <strong>T_OFFLINE(vetor):</strong><br>
+              <div style="padding-left: 25px;">
+                  <strong>plano</strong> ← CONSTRUIR_TABELA(tamanho do vetor)<br>
+                  <strong>exibir</strong> vetor <span style="color: #7f8c8d;"># Permutação inicial</span><br><br>
 
-            # Block 4: reverse direction of elements larger than the moved mobile.
-            for i in 0..n-1:
-              if a[i] > mobile:
-                d[i] <- -d[i]
-
-            output a
-      </pre>
-      <h3>Offline T - Pseudocode</h3>
-      <pre style="overflow:auto; background:#fff; border:1px solid #ebe2d6; border-radius:12px; padding:14px; line-height:1.45; white-space:pre-wrap; margin:0 0 12px;">
-        TRANSACTION_TABLE(n):
-          # Goal: precompute only the swap indices (transaction list), not full permutations.
-          run the same mobile-element loop above over a <- [1..n]
-          store only each (idx_mobile, prox) in transactions
-          return transactions
-
-        T_OFFLINE(vector):
-          # Goal: execute fast using the precomputed transaction list.
-          transactions <- TRANSACTION_TABLE(n)
-          a <- copy(vector)
-          output a
-
-          # Block: replay each adjacent swap to enumerate all permutations.
-          for each (i, j) in transactions:
-            swap a[i], a[j]
-            output a
-      </pre>
+                  <span style="color: #27ae60;"><strong>para cada</strong></span> (i, j) <span style="color: #27ae60;"><strong>em</strong></span> plano:<br>
+                  <div style="padding-left: 20px; border-left: 2px solid #bcd;">
+                      <strong>trocar</strong>(vetor[i], vetor[j]) <span style="color: #7f8c8d;"># Custo O(1)</span><br>
+                      <strong>exibir</strong> vetor
+                  </div>
+              </div>
+          </div>
+      </div>
 
       <div class="grid">
         <article class="subcard">
-          <h3>Offline Version</h3>
-          <p class="chart-desc">
-            This version prepares the swap plan. It finds which adjacent positions must be swapped
-            to move from one permutation to the next. The result is a compact roadmap.
-          </p>
-        </article>
-        <article class="subcard">
           <h3>Online Version</h3>
           <p class="chart-desc">
-            This version receives the precomputed plan and applies each swap in order. It does not
-            recompute the logic of the next move; it only follows the plan.
+            Esta versão recebe o plano pré-computado e aplica cada troca em ordem. Ela não recalcula a lógica da próxima jogada; apenas segue o plano.
           </p>
         </article>
+
+        <article class="subcard">
+          <h3>Offline Version</h3>
+          <p class="chart-desc">
+            Esta versão prepara o plano de troca. Ela encontra quais posições adjacentes devem ser trocadas para passar de uma permutação para a próxima. O resultado é um roteiro compacto.
+          </p>
+        </article>
+
         <article class="subcard">
           <h3>Step by Step</h3>
           <p class="chart-desc">
@@ -306,103 +334,9 @@
     </section>
 
     <section class="card">
-      <h2>Comparison Graphs</h2>
+      <h2>Dados</h2>
       <p class="small">
-        Each chart shows one metric only, so the differences between T (Online/Offline) and P stay readable.
-      </p>
-      <div class="chart-grid">
-        <article class="subcard">
-          <h3>Comparisons</h3>
-          <p class="chart-desc">Number of comparisons performed by T (Offline/Online total) and P for each n.</p>
-          <canvas id="comparisons-chart" class="chart" width="700" height="280"></canvas>
-          <div class="chart-legend">
-            <span class="legend-item"><span class="dot" style="background:var(--line-a)"></span>T Online</span>
-            <span class="legend-item"><span class="dot" style="background:var(--line-b)"></span>T Offline</span>
-            <span class="legend-item"><span class="dot" style="background:var(--line-c)"></span>P</span>            
-          </div>
-        </article>
-        <article class="subcard">
-          <h3>Local Variable Assignments</h3>
-          <p class="chart-desc">Assignments to loop counters, indexes, and other local variables.</p>
-          <canvas id="locals-chart" class="chart" width="700" height="280"></canvas>
-          <div class="chart-legend">
-            <span class="legend-item"><span class="dot" style="background:var(--line-a)"></span>T Online</span>
-            <span class="legend-item"><span class="dot" style="background:var(--line-b)"></span>T Offline</span>
-            <span class="legend-item"><span class="dot" style="background:var(--line-c)"></span>P</span>
-          </div>
-        </article>
-        <article class="subcard">
-          <h3>Vector Assignments</h3>
-          <p class="chart-desc">Actual data movement in the permutation vector and the swap plan.</p>
-          <canvas id="vector-chart" class="chart" width="700" height="280"></canvas>
-          <div class="chart-legend">
-            <span class="legend-item"><span class="dot" style="background:var(--line-a)"></span>T Online</span>
-            <span class="legend-item"><span class="dot" style="background:var(--line-b)"></span>T Offline</span>
-            <span class="legend-item"><span class="dot" style="background:var(--line-c)"></span>P</span>
-          </div>
-        </article>
-        <article class="subcard">
-          <h3>Execution Time</h3>
-          <p class="chart-desc">Total execution time in seconds. Uses a logarithmic Y axis because values grow very quickly.</p>
-          <canvas id="time-chart" class="chart" width="700" height="280"></canvas>
-          <div class="chart-legend">
-            <span class="legend-item"><span class="dot" style="background:var(--line-a)"></span>T Online</span>
-            <span class="legend-item"><span class="dot" style="background:var(--line-b)"></span>T Offline</span>
-            <span class="legend-item"><span class="dot" style="background:var(--line-c)"></span>P</span>
-          </div>
-        </article>
-      </div>
-    </section>
-
-    <section class="card">
-      <h2>Turning Point Analysis (1 GB Limit, n=3..20)</h2>
-      <p id="turning-summary" class="small"></p>
-      <div class="chart-grid">
-        <article class="subcard">
-          <h3>Time Ratio: T / P</h3>
-          <p class="chart-desc">Values below 1 mean T (Offline+Online) is faster than P.</p>
-          <canvas id="time-ratio-chart" class="chart" width="700" height="280"></canvas>
-          <div class="chart-legend">
-            <span class="legend-item"><span class="dot" style="background:var(--line-a)"></span>T Online / P</span>
-            <span class="legend-item"><span class="dot" style="background:var(--line-b)"></span>T Offline / P</span>
-          </div>
-        </article>
-        <article class="subcard">
-          <h3>Memory Ratio: T / P</h3>
-          <p class="chart-desc">How many times more memory T (Offline+Online) uses versus P.</p>
-          <canvas id="memory-ratio-chart" class="chart" width="700" height="280"></canvas>
-          <div class="chart-legend">
-            <span class="legend-item"><span class="dot" style="background:var(--line-a)"></span>T Online / P</span>
-            <span class="legend-item"><span class="dot" style="background:var(--line-b)"></span>T Offline / P</span>
-          </div>
-        </article>
-        <article class="subcard">
-          <h3>Time vs Memory Frontier</h3>
-          <p class="chart-desc">Each point is one n. Y is time (s), X is memory (KB), both in log scale.</p>
-          <canvas id="frontier-chart-online" class="chart" width="700" height="280"></canvas>
-          <div class="chart-legend">
-            <span class="legend-item"><span class="dot" style="background:var(--line-a)"></span>T Online</span>
-            <span class="legend-item"><span class="dot" style="background:var(--line-c)"></span>P</span>
-            <span class="legend-item"><span class="dot" style="background:#9a5f2f"></span>1 GB limit</span>
-          </div>
-        </article>
-        <article class="subcard">
-          <h3>Time vs Memory Frontier</h3>
-          <p class="chart-desc">Each point is one n. Y is time (s), X is memory (KB), both in log scale.</p>
-          <canvas id="frontier-chart-offline" class="chart" width="700" height="280"></canvas>
-          <div class="chart-legend">
-            <span class="legend-item"><span class="dot" style="background:var(--line-b)"></span>T Offline</span>
-            <span class="legend-item"><span class="dot" style="background:var(--line-c)"></span>P</span>
-            <span class="legend-item"><span class="dot" style="background:#9a5f2f"></span>1 GB limit</span>
-          </div>
-        </article>
-      </div>
-    </section>
-
-    <section class="card">
-      <h2>Raw</h2>
-      <p class="small">
-        Split metrics for Algorithm T: Offline table build (precompute swap plan) and T Online (algorithm run).
+        Análise operacional do Algoritmo T: decomposição entre o Custo de Capital (construção da tabela Offline) e o Custo Operacional (execução just-in-time).
       </p>
       <div style="overflow:auto;">
         <table id="raw-table"></table>
@@ -410,8 +344,76 @@
     </section>
 
     <section class="card">
-      <h2>Final Results</h2>
-      <p class="small">Consolidated comparison table for P, T (Online/Offline), T Offline, and T Online across all measured metrics.</p>
+      <h2>Análise Comparativa</h2>
+      <p class="small">
+        Comparação entre as implementações T (Online/Offline) e o Algoritmo P por métricas.
+      </p>
+      <div class="chart-grid">
+        <article class="subcard">
+          <h3>Comparações</h3>
+          <p class="chart-desc">O Algoritmo T reduz o esforço de comparações em relação ao P. Note que o T Offline apresenta custo zero, pois a lógica de decisão foi totalmente deslocada para a fase de pré-computação.</p>
+          <canvas id="comparisons-chart" class="chart" width="700" height="280"></canvas>
+          <div class="chart-legend">
+            <span class="legend-item"><span class="dot" style="background:var(--line-a)"></span>T Online</span>
+            <span class="legend-item"><span class="dot" style="background:var(--line-b)"></span>T Offline</span>
+            <span class="legend-item"><span class="dot" style="background:var(--line-c)"></span>Algoritmo P</span>            
+          </div>
+        </article>
+        <article class="subcard">
+          <h3>Atribuições ​locais</h3>
+          <p class="chart-desc">Mede a manipulação de contadores e ponteiros de estado. O crescimento exponencial no T Online reflete a necessidade de recalcular a mobilidade dos elementos a cada passo, enquanto o Offline opera em tempo constante por transição.</p>
+          <canvas id="locals-chart" class="chart" width="700" height="280"></canvas>
+          <div class="chart-legend">
+            <span class="legend-item"><span class="dot" style="background:var(--line-a)"></span>T Online</span>
+            <span class="legend-item"><span class="dot" style="background:var(--line-b)"></span>T Offline</span>
+            <span class="legend-item"><span class="dot" style="background:var(--line-c)"></span>Algoritmo P</span>
+          </div>
+        </article>
+        <article class="subcard">
+          <h3>Movimentação de Dados (Vetor)</h3>
+          <p class="chart-desc">Reflete o custo de <em>swaps</em> e atualizações nos vetores. A paridade entre T Online e P demonstra que, embora a lógica de decisão mude, o número de trocas físicas necessárias para manter a propriedade de mudança é inerente ao problema.</p>
+          <canvas id="vector-chart" class="chart" width="700" height="280"></canvas>
+          <div class="chart-legend">
+            <span class="legend-item"><span class="dot" style="background:var(--line-a)"></span>T Online</span>
+            <span class="legend-item"><span class="dot" style="background:var(--line-b)"></span>T Offline</span>
+            <span class="legend-item"><span class="dot" style="background:var(--line-c)"></span>Algoritmo P</span>
+          </div>
+        </article>
+        <article class="subcard">
+          <h3>Tempo de execução</h3>
+          <p class="chart-desc">Tempo total de execução. Para <em>n=10</em>, o T Offline é mais veloz, evidenciando o benefício da amortização do custo de setup em sistemas de alta performance.</p>
+          <canvas id="time-chart" class="chart" width="700" height="280"></canvas>
+          <div class="chart-legend">
+            <span class="legend-item"><span class="dot" style="background:var(--line-a)"></span>T Online</span>
+            <span class="legend-item"><span class="dot" style="background:var(--line-b)"></span>T Offline</span>
+            <span class="legend-item"><span class="dot" style="background:var(--line-c)"></span>Algoritmo P</span>
+          </div>
+        </article>
+      </div>
+    </section>        
+
+    <section class="card">
+      <h2>Análise de Ponto de Virada (Limite de 1 GB, n=3..15)</h2>
+      <p id="turning-summary" class="small"></p>
+      <div class="chart-grid">
+        <article class="subcard">
+          <h3>Time vs Memory Frontier</h3>
+          <p class="chart-desc">Each point is one n. Y is time (s), X is memory (KB), both in log scale.</p>
+          <canvas id="frontier-chart" class="chart" width="700" height="280"></canvas>
+          <div class="chart-legend">
+            <span class="legend-item"><span class="dot" style="background:var(--line-a)"></span>T Online</span>
+            <span class="legend-item"><span class="dot" style="background:var(--line-b)"></span>T Offline</span>
+            <span class="legend-item"><span class="dot" style="background:var(--line-c)"></span>Algoritmo P</span>
+            <span class="legend-item"><span class="dot" style="background:#9a5f2f"></span>1 GB limit</span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+
+    <section class="card">
+      <h2>Resultados finais</h2>
+      <p class="small">Tabela comparativa consolidada para P, T (Online/Offline), T Offline e T Online em todas as métricas medidas.</p>
       <div style="overflow:auto;">
         <table id="final-results-table"></table>
       </div>
@@ -434,12 +436,8 @@
         const fromMs = (v) => Number(v || 0) / 1000;
         const getTotal = (block) => block?.total || {};
 
-        const pTotal = getTotal(r.p);
-
         const legacyTOnline = getTotal(r.t_online || {});
-        const legacyTOffline = getTotal(r.t_offline || {});
-
-        const onlineAlgo = r.t?.online_algo || {
+        const online = r.t?.online || {
           comparisons: Number(legacyTOnline.comparisons || 0),
           local_assignments: Number(legacyTOnline.local_assignments || 0),
           vector_assignments: Number(legacyTOnline.vector_assignments || 0),
@@ -447,6 +445,7 @@
           memory_kb: Number(legacyTOnline.memory_kb || 0)
         };
 
+        const legacyTOffline = getTotal(r.t_offline || {});
         const offline = r.t?.offline || {
           comparisons: Number(legacyTOffline.comparisons || 0),
           local_assignments: Number(legacyTOffline.local_assignments || 0),
@@ -455,20 +454,10 @@
           memory_kb: Number(legacyTOffline.memory_kb || 0)
         };
 
-        const online = r.t?.online || { comparisons: 0, local_assignments: 0, vector_assignments: 0, time_seconds: 0, memory_kb: 0 };
-
-        const total = r.t?.total || {
-          comparisons: offline.comparisons + online.comparisons,
-          local_assignments: offline.local_assignments + online.local_assignments,
-          vector_assignments: offline.vector_assignments + online.vector_assignments,
-          time_seconds: offline.time_seconds + online.time_seconds,
-          memory_kb: Number(offline.memory_kb || online.memory_kb || 0)
-        };
-
+        const pTotal = getTotal(r.p);
         const pBlock = r.p || {
           total: { comparisons: 0, local_assignments: 0, vector_assignments: 0, time_seconds: 0 }
         };
-
         pBlock.total = {
           comparisons: Number(pTotal.comparisons || 0),
           local_assignments: Number(pTotal.local_assignments || 0),
@@ -479,7 +468,7 @@
 
         return {
           n: r.n,
-          t: { offline, online, total, online_algo: onlineAlgo },
+          t: { offline, online },
           p: pBlock,
           break_even_runs_time_p: r.break_even_runs_time_p ?? r.break_even_runs_time ?? null
         };
@@ -497,32 +486,33 @@
       let html = "<thead>";
       html += "<tr>" + [
         '<th rowspan="2">n</th>',
-        '<th colspan="4" class="group-head">T Offline - Transaction Table (Tab.)</th>',
-        '<th colspan="4" class="group-head">T Online (Algorithm)</th>'
+        '<th colspan="4" class="group-head">T Online </th>',
+        '<th colspan="4" class="group-head">T Offline</th>'        
       ].join("") + "</tr>";
 
       html += "<tr>" + [
         "<th>C</th>",
         "<th>A (local vars)</th>",
         "<th>A (to/from V)</th>",
-        "<th>T (s)</th>",
+        "<th>T (sec)</th>",
         "<th>C</th>",
         "<th>A (local vars)</th>",
         "<th>A (to/from V)</th>",
-        "<th>T (s)</th>"
+        "<th>T (sec)</th>"
       ].join("") + "</tr></thead><tbody>";
 
       for (const r of rows) {
         html += "<tr>" + [
           r.n,
-          fmt(r.t.offline.comparisons),
-          fmt(r.t.offline.local_assignments),
-          fmt(r.t.offline.vector_assignments),
-          sec(r.t.offline.time_seconds),
-          fmt(r.t.online_algo.comparisons),
-          fmt(r.t.online_algo.local_assignments),
-          fmt(r.t.online_algo.vector_assignments),
-          sec(r.t.online_algo.time_seconds)
+          fmt(r.t.online.comparisons),
+          fmt(r.t.online.local_assignments),
+          fmt(r.t.online.vector_assignments),
+          sec(r.t.online.time_seconds),
+
+          fmt(r.t.offline.total.comparisons),
+          fmt(r.t.offline.total.local_assignments),
+          fmt(r.t.offline.total.vector_assignments),
+          sec(r.t.offline.total.time_seconds)
         ].map(v => `<td>${v}</td>`).join("") + "</tr>";
       }
 
@@ -541,44 +531,59 @@
         "n",
         "T Online",
         "T Offline",
+        "T Offline (Tab.)",
         "P"
       ];
 
       const sections = [
         {
-          title: "Comparisons",
+          title: "Comparações",
           key: "comparisons",
           pick: r => ({
-            tOnline: r.t.online_algo.comparisons,
-            tOffline: r.t.offline.comparisons,
+            tOnline: r.t.online.comparisons,
+            tOffline: r.t.offline.op.comparisons,
+            tOfflineTab: r.t.offline.tab.comparisons,
             p: r.p.total.comparisons
           })
         },
         {
-          title: "Local Variable Assignments",
+          title: "Atribuições de variáveis ​​locais",
           key: "local",
           pick: r => ({
-            tOnline: r.t.online_algo.local_assignments,
-            tOffline: r.t.offline.local_assignments,
+            tOnline: r.t.online.local_assignments,
+            tOffline: r.t.offline.op.local_assignments,
+            tOfflineTab: r.t.offline.tab.local_assignments,
             p: r.p.total.local_assignments
           })
         },
         {
-          title: "Vector Assignments",
+          title: "Atribuições de vetores",
           key: "vector",
           pick: r => ({
-            tOnline: r.t.online_algo.vector_assignments,
-            tOffline: r.t.offline.vector_assignments,  
+            tOnline: r.t.online.vector_assignments,
+            tOffline: r.t.offline.op.vector_assignments,  
+            tOfflineTab: r.t.offline.tab.vector_assignments,  
             p: r.p.total.vector_assignments
           })
         },
         {
-          title: "Time (seconds)",
+          title: "Tempo (seg)",
           key: "time",
           pick: r => ({            
-            tOnline: r.t.online_algo.time_seconds,
-            tOffline: r.t.offline.time_seconds,
+            tOnline: r.t.online.time_seconds,
+            tOffline: r.t.offline.op.time_seconds,
+            tOfflineTab: r.t.offline.tab.time_seconds,
             p: r.p.total.time_seconds
+          })
+        },
+        {
+          title: "Memória (kb)",
+          key: "time",
+          pick: r => ({            
+            tOnline: r.t.online.memory_kb,
+            tOffline: r.t.offline.memory_kb,
+            tOfflineTab: r.t.offline.memory_kb,
+            p: r.p.total.memory_kb
           })
         }
       ];
@@ -593,6 +598,7 @@
             r.n,
             metricFmt(section.key, m.tOnline),
             metricFmt(section.key, m.tOffline),
+            metricFmt(section.key, m.tOfflineTab),
             metricFmt(section.key, m.p)
           ].map(v => `<td>${v}</td>`).join("") + "</tr>";
         });
@@ -709,7 +715,7 @@
       });
 
       values.forEach((data, index) => {
-        ctx.strokeStyle = getColorVar(["--line-a", "--line-b", "--line-c"][index]);
+        ctx.strokeStyle = getColorVar(["--line-a", "--line-b", "--line-c", "--line-d"][index]);
         ctx.lineWidth = 2.4;
         ctx.beginPath();
         data.forEach((v, i) => {
@@ -742,6 +748,7 @@
       ctx.fillText(yLabel, pad.left - 64, pad.top - 4);
     }
 
+    
     function drawFrontierChart(canvasId, rows, memoryLimitKb) {
       const canvas = document.getElementById(canvasId);
       const ctx = canvas.getContext("2d");
@@ -749,9 +756,11 @@
       const h = canvas.height;
       const pad = { left: 72, right: 16, top: 18, bottom: 40 };
 
-      const tPoints = rows.map(r => ({ n: r.n, x: r.t.total.memory_kb, y: r.t.total.time_seconds }));
+      const tOnPoints = rows.map(r => ({ n: r.n, x: r.t.online.memory_kb, y: r.t.online.time_seconds }));
+      const tOffPoints = rows.map(r => ({ n: r.n, x: r.t.offline.memory_kb, y: r.t.offline.total.time_seconds }));
       const pPoints = rows.map(r => ({ n: r.n, x: r.p.total.memory_kb, y: r.p.total.time_seconds }));
-      const all = tPoints.concat(pPoints).filter(p => p.x > 0 && p.y > 0);
+      
+      const all = tOffPoints.concat(tOnPoints).concat(pPoints).filter(p => p.x > 0 && p.y > 0);
       if (!all.length) return;
 
       const minX = Math.min(...all.map(p => p.x));
@@ -829,9 +838,10 @@
           ctx.fillText(String(pt.n), x + 4, y - 4);
         });
       };
-
-      drawSeries(tPoints, getColorVar("--line-a"));
-      drawSeries(pPoints, getColorVar("--line-b"));
+      console.log(tOffPoints)
+      drawSeries(tOnPoints, getColorVar("--line-a"));
+      drawSeries(tOffPoints, getColorVar("--line-b"));
+      drawSeries(pPoints, getColorVar("--line-c"));
 
       if (memoryLimitKb > 0) {
         const xLimit = xToPx(memoryLimitKb);
@@ -1066,11 +1076,10 @@
       ctx.fillText("time (s, log10)", 6, pad.top - 4);
     }
 
-
     function computeTurningPoint(rows, memoryLimitKb) {
       for (const r of rows) {
-        const tMem = Number(r.t.total.memory_kb || 0);
-        const tTime = Number(r.t.total.time_seconds || 0);
+        const tMem = Number(r.t.offline.memory_kb || 0);
+        const tTime = Number(r.t.offline.total.time_seconds || 0);
         const pTime = Number(r.p.total.time_seconds || 0);
         if (tMem > memoryLimitKb || tTime >= pTime) {
           return r.n;
@@ -1085,9 +1094,7 @@
         p: { total: { ...r.p.total } },
         t: {
           offline: { ...r.t.offline },
-          online: { ...r.t.online },
-          total: { ...r.t.total },
-          online_algo: { ...r.t.online_algo }
+          online: { ...r.t.online }
         },
         _projected: Boolean(r._projected)
       };
@@ -1102,7 +1109,7 @@
       return ratio;
     }
 
-    function buildTurningDataset(measuredRows, fromN = 3, toN = 20) {
+    function buildTurningDataset(measuredRows, fromN = 3, toN = 15) {
       const byN = new Map(measuredRows.map(r => [r.n, r]));
       const measuredSorted = measuredRows.slice().sort((a, b) => a.n - b.n);
       const base = measuredSorted[measuredSorted.length - 1];
@@ -1124,17 +1131,12 @@
         projected.p.total.time_seconds = base.p.total.time_seconds * factScale * linearScale;
         projected.p.total.memory_kb = base.p.total.memory_kb * linearScale;
 
-        projected.t.total.time_seconds = base.t.total.time_seconds * factScale;
-        projected.t.total.memory_kb = base.t.total.memory_kb * factScale;
+        projected.t.online.time_seconds = base.t.online.time_seconds * factScale * linearScale;
+        projected.t.online.memory_kb = base.t.online.memory_kb * linearScale;
 
-        projected.t.offline.time_seconds = base.t.offline.time_seconds * factScale;
-        projected.t.offline.memory_kb = projected.t.total.memory_kb;
+        projected.t.offline.total.time_seconds = base.t.offline.total.time_seconds * factScale * linearScale;
+        projected.t.offline.memory_kb = base.t.offline.memory_kb * linearScale;
 
-        projected.t.online.time_seconds = base.t.online.time_seconds * factScale;
-        projected.t.online.memory_kb = projected.t.total.memory_kb;
-
-        projected.t.online_algo.time_seconds = base.t.online_algo.time_seconds * factScale * linearScale;
-        projected.t.online_algo.memory_kb = base.t.online_algo.memory_kb * linearScale;
         projected._projected = true;
 
         out.push(projected);
@@ -1144,44 +1146,20 @@
     }
 
     function buildTurningPointAnalysis(rows, memoryLimitKb) {
-      const turningRows = buildTurningDataset(rows, 3, 20);
+      const turningRows = buildTurningDataset(rows, 3, 15);
       const turningN = computeTurningPoint(turningRows, memoryLimitKb);
       const summary = document.getElementById("turning-summary");
       const measuredMax = Math.max(...rows.map(r => r.n));
       const projectedCount = turningRows.filter(r => r._projected).length;
+
       if (turningN == null) {
-        summary.textContent = `No turning point found in n=3..20 for limit ${fmt(memoryLimitKb)} KB (1 GB). Measured: n=3..${measuredMax}; projected points: ${projectedCount}.`;
+        summary.textContent = `No turning point found in n=3..15 for limit ${fmt(memoryLimitKb)} KB (1 GB). Measured: n=3..${measuredMax}; projected points: ${projectedCount}.`;
       } else {
-        summary.textContent = `Estimated turning point: n=${turningN} in n=3..20 for 1 GB (${fmt(memoryLimitKb)} KB), using rule: T memory > limit or T time >= P time. Measured: n=3..${measuredMax}; projected points: ${projectedCount}.`;
+        
+        summary.textContent = `Ponto de inflexão estimado: n=${turningN} em n=3..15 para 1 GB (${fmt(memoryLimitKb)} KB), usando a regra: T memória > limite ou T tempo >= P tempo. Medido: n=3..${measuredMax}; pontos projetados: ${projectedCount}.`;
       }
 
-      drawMetricChart(
-        "time-ratio-chart",
-        turningRows,
-        [r => r.t.online.time_seconds / Math.max(r.p.total.time_seconds, 1e-12), r => r.t.offline.time_seconds / Math.max(r.p.total.time_seconds, 1e-12)],
-        ["T Online/P", "T Offline/P"],
-        "ratio",
-        {
-          markerN: turningN,
-          yTickFormatter: v => v.toFixed(2)
-        }
-      );
-
-      drawMetricChart(
-        "memory-ratio-chart",
-        turningRows,
-        [r => r.t.online.memory_kb / Math.max(r.p.total.memory_kb, 1e-12), r => r.t.offline.memory_kb / Math.max(r.p.total.memory_kb, 1e-12)],
-        ["T Online/P", "T Offline/P"],
-        "ratio",
-        {
-          logY: true,
-          markerN: turningN,
-          yTickFormatter: v => scalarFmt(v)
-        }
-      );
-
-      drawFrontierChartOnline("frontier-chart-online", turningRows, memoryLimitKb);
-      drawFrontierChartOffline("frontier-chart-offline", turningRows, memoryLimitKb);
+      drawFrontierChart("frontier-chart", turningRows, memoryLimitKb);
     }
 
     function animateSample(sample) {
@@ -1191,8 +1169,8 @@
         box.textContent = "No sample";
         return;
       }
-
-      meta.textContent = `n = ${sample.n} | showing all ${sample.first_permutations.length} permutations`;
+      
+      meta.textContent = `n = ${sample.n} | mostrando todas as ${sample.first_permutations.length} permutações`;
       const arr = sample.first_permutations;
       let i = 0;
       let timerId = null;
@@ -1254,17 +1232,23 @@
       const tOnline = obj?.["T online"] || {};
       const tOffline = obj?.["T offline"] || {};
 
-      const offlineComp = getMetricValue(tOffline, "Comparações - Tab.");
-      const offlineLocal = getMetricValue(tOffline, "Atrib. (Local) - Tab.");
-      const offlineVector = getMetricValue(tOffline, "Atrib. (Vetor) - Tab.");
-      const offlineTime = getMetricValue(tOffline, "Setup (ms)") / 1000;
+      const offlineCompTab = getMetricValue(tOffline, "Comparações - Tab.");
+      const offlineLocalTab = getMetricValue(tOffline, "Atrib. (Local) - Tab.");
+      const offlineVectorTab = getMetricValue(tOffline, "Atrib. (Vetor) - Tab.");
+      const offlineTimeTab = getMetricValue(tOffline, "Setup (ms)") / 1000;
 
-      const onlineComp = getMetricValue(tOffline, "Comparações");
-      const onlineLocal = getMetricValue(tOffline, "Atrib. (Local)");
-      const onlineVector = getMetricValue(tOffline, "Atrib. (Vetor)");
-      const totalOperationMs = getMetricValue(tOffline, "Operation (ms)");
-      const setupMs = getMetricValue(tOffline, "Setup (ms)");
-      const onlineTime = Math.max(0, (totalOperationMs - setupMs) / 1000);
+      const offlineCompOp = getMetricValue(tOffline, "Comparações");
+      const offlineLocalOp = getMetricValue(tOffline, "Atrib. (Local)");
+      const offlineVectorOp = getMetricValue(tOffline, "Atrib. (Vetor)");
+      const offlineTimeOp = getMetricValue(tOffline, "Operation (ms)") / 1000;
+
+      const offlineMemory = getMetricValue(tOffline, "Memória (kb)")
+
+      const onlineComp = getMetricValue(tOnline, "Comparações");
+      const onlineLocal = getMetricValue(tOnline, "Atrib. (Local)");
+      const onlineVector = getMetricValue(tOnline, "Atrib. (Vetor)");
+      const onlineTime = getMetricValue(tOnline, "Operation (ms)") / 1000;
+      const onlineMemory = getMetricValue(tOnline, "Memória (kb)")
 
       return {
         n,
@@ -1279,32 +1263,32 @@
         },
         t: {
           offline: {
-            comparisons: offlineComp,
-            local_assignments: offlineLocal,
-            vector_assignments: offlineVector,
-            time_seconds: offlineTime,
-            memory_kb: getMetricValue(tOffline, "Memória (kb)")
+            memory_kb: offlineMemory,
+            tab: {
+              comparisons: offlineCompTab,
+              local_assignments: offlineLocalTab,
+              vector_assignments: offlineVectorTab,
+              time_seconds: offlineTimeTab,
+            },
+            op: {
+              comparisons: offlineCompOp,
+              local_assignments: offlineLocalOp,
+              vector_assignments: offlineVectorOp,            
+              time_seconds: offlineTimeOp - offlineTimeTab,
+            },
+            total: {
+              comparisons: offlineCompTab + offlineCompOp,
+              local_assignments: offlineLocalTab + offlineLocalOp,
+              vector_assignments: offlineVectorTab + offlineVectorOp,
+              time_seconds: offlineTimeOp,
+            }
           },
           online: {
             comparisons: onlineComp,
             local_assignments: onlineLocal,
             vector_assignments: onlineVector,
             time_seconds: onlineTime,
-            memory_kb: getMetricValue(tOffline, "Memória (kb)")
-          },
-          total: {
-            comparisons: offlineComp + onlineComp,
-            local_assignments: offlineLocal + onlineLocal,
-            vector_assignments: offlineVector + onlineVector,
-            time_seconds: offlineTime + onlineTime,
-            memory_kb: getMetricValue(tOffline, "Memória (kb)")
-          },
-          online_algo: {
-            comparisons: getMetricValue(tOnline, "Comparações"),
-            local_assignments: getMetricValue(tOnline, "Atrib. (Local)"),
-            vector_assignments: getMetricValue(tOnline, "Atrib. (Vetor)"),
-            time_seconds: getMetricValue(tOnline, "Operation (ms)") / 1000,
-            memory_kb: getMetricValue(tOnline, "Memória (kb)")
+            memory_kb: onlineMemory
           }
         }
       };
@@ -1327,7 +1311,7 @@
 
       // Prefer native repository files under /results generated by src/main.py
       data = await loadRepositoryData();
-
+      
       if (!data && window.__ALGO_T_RESULTS__) {
         data = window.__ALGO_T_RESULTS__;
       } else if (!data) {
@@ -1342,36 +1326,37 @@
           data = await res.json();
         }
       }
-
+      
       data = normalizeData(data);
+      
 
       buildRawTable(data.rows);
       buildFinalResultsTable(data.rows);
       drawMetricChart(
         "comparisons-chart",
         data.rows,
-        [r => r.t.online.comparisons, r => r.t.offline.comparisons, r => r.p.total.comparisons],
+        [r => r.t.online.comparisons, r => r.t.offline.total.comparisons, r => r.p.total.comparisons],
         ["T Online", "T Offline", "P"],
         "comparisons"
       );
       drawMetricChart(
         "locals-chart",
         data.rows,
-        [r => r.t.online.local_assignments, r => r.t.offline.local_assignments, r => r.p.total.local_assignments],     
+        [r => r.t.online.local_assignments, r => r.t.offline.total.local_assignments, r => r.p.total.local_assignments],     
         ["T Online", "T Offline", "P"],
         "local assignments"
       );
       drawMetricChart(
         "vector-chart",
         data.rows,
-        [r => r.t.online.vector_assignments, r => r.t.offline.vector_assignments, r => r.p.total.vector_assignments],
+        [r => r.t.online.vector_assignments, r => r.t.offline.total.vector_assignments, r => r.p.total.vector_assignments],
         ["T Online", "T Offline", "P"],
         "vector assignments"
       );
       drawMetricChart(
         "time-chart",
         data.rows,
-        [r => r.t.online.time_seconds, r => r.t.offline.time_seconds, r => r.p.total.time_seconds],
+        [r => r.t.online.time_seconds, r => r.t.offline.total.time_seconds, r => r.p.total.time_seconds],
         ["T Online", "T Offline", "P"],
         "seconds (log10)",
         { logY: true }

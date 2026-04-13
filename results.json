@@ -5,18 +5,18 @@
       "n": 3,
       "p": {
         "total": {
-          "time_ms": 0.03178499173372984,
-          "comparisons": 85,
+          "time_ms": 0.03409991040825844,
+          "comparisons": 88,
           "local_assignments": 47,
           "vector_assignments": 28
         }
       },
       "t_online": {
         "total": {
-          "time_ms": 0.06024097092449665,
-          "comparisons": 88,
-          "local_assignments": 47,
-          "vector_assignments": 32
+          "time_ms": 0.022093066945672035,
+          "comparisons": 30,
+          "local_assignments": 27,
+          "vector_assignments": 45
         }
       }
     },
@@ -24,18 +24,18 @@
       "n": 4,
       "p": {
         "total": {
-          "time_ms": 0.22735295351594687,
-          "comparisons": 485,
+          "time_ms": 0.16843504272401333,
+          "comparisons": 494,
           "local_assignments": 229,
           "vector_assignments": 107
         }
       },
       "t_online": {
         "total": {
-          "time_ms": 0.3820600686594844,
-          "comparisons": 494,
-          "local_assignments": 229,
-          "vector_assignments": 129
+          "time_ms": 0.042309053242206573,
+          "comparisons": 128,
+          "local_assignments": 112,
+          "vector_assignments": 164
         }
       }
     },
@@ -43,18 +43,18 @@
       "n": 5,
       "p": {
         "total": {
-          "time_ms": 2.5228200247511268,
-          "comparisons": 3111,
+          "time_ms": 1.1861170642077923,
+          "comparisons": 3151,
           "local_assignments": 1317,
           "vector_assignments": 516
         }
       },
       "t_online": {
         "total": {
-          "time_ms": 1.5680899377912283,
-          "comparisons": 3151,
-          "local_assignments": 1317,
-          "vector_assignments": 634
+          "time_ms": 0.34643104299902916,
+          "comparisons": 650,
+          "local_assignments": 565,
+          "vector_assignments": 785
         }
       }
     },
@@ -62,18 +62,18 @@
       "n": 6,
       "p": {
         "total": {
-          "time_ms": 9.710317011922598,
-          "comparisons": 22669,
+          "time_ms": 8.881869027391076,
+          "comparisons": 22914,
           "local_assignments": 8887,
           "vector_assignments": 3037
         }
       },
       "t_online": {
         "total": {
-          "time_ms": 9.696127031929791,
-          "comparisons": 22914,
-          "local_assignments": 8887,
-          "vector_assignments": 3755
+          "time_ms": 2.7716581244021654,
+          "comparisons": 3912,
+          "local_assignments": 3396,
+          "vector_assignments": 4650
         }
       }
     },
@@ -81,18 +81,18 @@
       "n": 7,
       "p": {
         "total": {
-          "time_ms": 76.64953800849617,
-          "comparisons": 186467,
+          "time_ms": 71.18341117165983,
+          "comparisons": 188273,
           "local_assignments": 68669,
           "vector_assignments": 21038
         }
       },
       "t_online": {
         "total": {
-          "time_ms": 72.37665704451501,
-          "comparisons": 188273,
-          "local_assignments": 68669,
-          "vector_assignments": 26076
+          "time_ms": 19.242660142481327,
+          "comparisons": 27398,
+          "local_assignments": 23779,
+          "vector_assignments": 32459
         }
       }
     },
@@ -100,18 +100,18 @@
       "n": 8,
       "p": {
         "total": {
-          "time_ms": 642.2135719330981,
-          "comparisons": 1713585,
+          "time_ms": 644.0618950873613,
+          "comparisons": 1728712,
           "local_assignments": 600595,
           "vector_assignments": 167199
         }
       },
       "t_online": {
         "total": {
-          "time_ms": 665.3661959571764,
-          "comparisons": 1728712,
-          "local_assignments": 600595,
-          "vector_assignments": 207517
+          "time_ms": 162.66366397030652,
+          "comparisons": 219200,
+          "local_assignments": 190240,
+          "vector_assignments": 259544
         }
       }
     },
@@ -119,18 +119,18 @@
       "n": 9,
       "p": {
         "total": {
-          "time_ms": 6291.903962031938,
-          "comparisons": 17418223,
+          "time_ms": 6380.666949087754,
+          "comparisons": 17559351,
           "local_assignments": 5847583,
           "vector_assignments": 1497760
         }
       },
       "t_online": {
         "total": {
-          "time_ms": 6425.55376002565,
-          "comparisons": 17559351,
-          "local_assignments": 5847583,
-          "vector_assignments": 1860638
+          "time_ms": 1447.645705891773,
+          "comparisons": 1972818,
+          "local_assignments": 1712169,
+          "vector_assignments": 2335725
         }
       }
     },
@@ -138,18 +138,18 @@
       "n": 10,
       "p": {
         "total": {
-          "time_ms": 67122.16776493005,
-          "comparisons": 194140781,
+          "time_ms": 69723.46310899593,
+          "comparisons": 195592310,
           "local_assignments": 62887219,
           "vector_assignments": 14924321
         }
       },
       "t_online": {
         "total": {
-          "time_ms": 71985.03508709837,
-          "comparisons": 195592310,
-          "local_assignments": 62887219,
-          "vector_assignments": 18553119
+          "time_ms": 14321.950009092689,
+          "comparisons": 19728200,
+          "local_assignments": 17121700,
+          "vector_assignments": 23357030
         }
       }
     }

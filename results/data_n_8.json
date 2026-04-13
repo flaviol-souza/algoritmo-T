@@ -11,7 +11,7 @@
         "Trocas - Tab.": 0,
         "Mem\u00f3ria (kb)": 2.62890625,
         "Setup (ms)": 0,
-        "Operation (ms)": 633.2788170548156
+        "Operation (ms)": 644.0618950873613
     },
     "T online": {
         "n!": 40320,
@@ -23,9 +23,9 @@
         "Atrib. (Vetor) - Tab.": 0,
         "Trocas": 40319,
         "Trocas - Tab.": 0,
-        "Mem\u00f3ria (kb)": 2549.0390625,
+        "Mem\u00f3ria (kb)": 1.3125,
         "Setup (ms)": 0,
-        "Operation (ms)": 178.39546699542552
+        "Operation (ms)": 162.66366397030652
     },
     "T offline": {
         "n!": 40320,
@@ -37,8 +37,8 @@
         "Atrib. (Vetor) - Tab.": 219216,
         "Trocas": 40319,
         "Trocas - Tab.": 0,
-        "Mem\u00f3ria (kb)": 2440.0546875,
-        "Setup (ms)": 160.32464802265167,
-        "Operation (ms)": 201.0423419997096
+        "Mem\u00f3ria (kb)": 2549.484375,
+        "Setup (ms)": 162.65364387072623,
+        "Operation (ms)": 204.62265401147306
     }
 }
