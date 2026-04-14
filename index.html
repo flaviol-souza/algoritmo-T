@@ -231,10 +231,10 @@
     </section>
 
     <section class="card">
-      <h2>How Algorithm T Works</h2>
+      <h2>Como funciona o algoritmo T</h2>
       <p class="small">
-        Algorithm T is split into two simple functions. The offline phase builds a swap plan once.
-        The online phase reuses that plan to generate permutations quickly.
+        O algoritmo T é dividido em duas funções simples. A fase offline constrói um plano de troca uma única vez.
+        A fase online reutiliza esse plano para gerar permutações rapidamente.
       </p>
 
       <h3>Pseudocode - T Online</h3>
@@ -300,32 +300,7 @@
           </div>
       </div>
 
-      <div class="grid">
-        <article class="subcard">
-          <h3>Online Version</h3>
-          <p class="chart-desc">
-            Esta versão recebe o plano pré-computado e aplica cada troca em ordem. Ela não recalcula a lógica da próxima jogada; apenas segue o plano.
-          </p>
-        </article>
-
-        <article class="subcard">
-          <h3>Offline Version</h3>
-          <p class="chart-desc">
-            Esta versão prepara o plano de troca. Ela encontra quais posições adjacentes devem ser trocadas para passar de uma permutação para a próxima. O resultado é um roteiro compacto.
-          </p>
-        </article>
-
-        <article class="subcard">
-          <h3>Step by Step</h3>
-          <p class="chart-desc">
-            1. Start with the identity permutation.<br>
-            2. Build the swap plan offline.<br>
-            3. Reuse that plan online to generate every new permutation.<br>
-            4. Measure offline and online costs separately.<br>
-            5. Compare T with P.
-          </p>
-        </article>
-      </div>
+    
     </section>
 
     <section class="card">
