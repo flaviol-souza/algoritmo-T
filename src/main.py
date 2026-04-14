@@ -1,10 +1,8 @@
-import matplotlib.pyplot as plt
 import math
 import time
 import json
 import tracemalloc
 import gc
-import json
 import sys
 import os
 
@@ -64,69 +62,7 @@ def print_tabelas_finais(n_list, all_data):
         
         print(header_line)
         
-def plot_results(n_list, metrics):
-    
-    for alg, data in metrics.items():
-        plt.figure(figsize=(10, 6))
-        
-        plt.plot(n_list, data[COMP], label=COMP, marker='o')
-        if data[COMP_TAB][0] > 0:
-            plt.plot(n_list, data[COMP_TAB], label=COMP_TAB, marker='o')
-        
-        plt.plot(n_list, data[ATTR_LOCAL], label=ATTR_LOCAL, marker='s')
-        if data[ATTR_LOCAL_TAB][0] > 0:
-            plt.plot(n_list, data[ATTR_LOCAL_TAB], label=ATTR_LOCAL_TAB, marker='s')
-        
-        plt.plot(n_list, data[ATTR_VECTOR], label=ATTR_VECTOR, marker='s')
-        if data[ATTR_VECTOR_TAB][0] > 0:
-            plt.plot(n_list, data[ATTR_VECTOR_TAB], label=ATTR_VECTOR_TAB, marker='s')
-
-        plt.plot(n_list, data[EXCHANGES], label=EXCHANGES, marker='x')
-        if data[EXCHANGES_TAB][0] > 0:
-            plt.plot(n_list, data[EXCHANGES_TAB], label=EXCHANGES_TAB, marker='>')
-
-        plt.yscale('log') 
-        plt.xlabel('n (Tamanho da entrada)')
-        plt.ylabel('Contagem (Escala Log)')
-        plt.title(f'Complexidade de Geração de Permutações ({alg})')
-        plt.legend()
-        plt.grid(True, which="both", ls="-", alpha=0.5)
-        plt.savefig(f'{RESULTS_DIR}/{alg}.png')
-        #plt.show()
-
-def plot_comparativo_recursos(n_list, metrics):
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 6))
-    
-    for alg_name, data in metrics.items():
-        d = data[TIME_OPERATION]
-        #if "offline" in alg_name.lower():
-        #    d = data[TIME_SETUP]
-            
-        ax1.plot(n_list, d, label=f"{alg_name}", marker='o')
-        ax2.plot(n_list, data[MEMORY], label=alg_name, marker='s')
-
-    # Configurações do gráfico de Tempo
-    ax1.set_yscale('log')
-    ax1.set_xlabel('n (Tamanho da entrada)')
-    ax1.set_ylabel('Tempo (ms)')
-    ax1.set_title('Comparativo de Tempo')
-    ax1.legend()
-    ax1.grid(True, which="both", ls="-", alpha=0.5)
-
-    # Configurações do gráfico de Memória
-    ax2.set_yscale('log')
-    ax2.set_xlabel('n (Tamanho da entrada)')
-    ax2.set_ylabel('Pico de Memória (KB)')
-    ax2.set_title('Consumo de Memória')
-    ax2.legend()
-    ax2.grid(True, which="both", ls="-", alpha=0.5)
-
-    plt.tight_layout()
-    plt.savefig('results/recursos.png')
-    #plt.show()
-
 def export_to_web_report(all_data, filename="results"):
-    import json
     # Estrutura compatível com o index.html anterior
     web_data = {
         "algorithm": "Comparativo P vs T",
@@ -232,33 +168,8 @@ def generate_reports():
         return
 
     n_list = sorted(data.keys())
-        
-    formatted_metrics = {}
-    for name in algoritms.keys():
-        formatted_metrics[name] = {
-            COMP: [], COMP_TAB: [], 
-            ATTR_LOCAL: [], ATTR_LOCAL_TAB: [], ATTR_VECTOR: [], ATTR_VECTOR_TAB: [],
-            EXCHANGES: [], EXCHANGES_TAB: [], MEMORY: [], TIME_SETUP: [], TIME_OPERATION: []
-        }
-
-    for n in n_list:
-        for name in algoritms.keys():
-            res = data[n][name]
-            formatted_metrics[name][COMP].append(res[COMP])
-            formatted_metrics[name][COMP_TAB].append(res[COMP_TAB])
-            formatted_metrics[name][ATTR_LOCAL].append(res[ATTR_LOCAL])
-            formatted_metrics[name][ATTR_LOCAL_TAB].append(res[ATTR_LOCAL_TAB])
-            formatted_metrics[name][ATTR_VECTOR].append(res[ATTR_VECTOR])
-            formatted_metrics[name][ATTR_VECTOR_TAB].append(res[ATTR_VECTOR_TAB])
-            formatted_metrics[name][EXCHANGES].append(res[EXCHANGES])
-            formatted_metrics[name][EXCHANGES_TAB].append(res[EXCHANGES_TAB])
-            formatted_metrics[name][MEMORY].append(res[MEMORY])
-            formatted_metrics[name][TIME_SETUP].append(res[TIME_SETUP])
-            formatted_metrics[name][TIME_OPERATION].append(res[TIME_OPERATION])
 
     print_tabelas_finais(n_list, data) 
-    plot_results(n_list, formatted_metrics)
-    plot_comparativo_recursos(n_list, formatted_metrics)
     export_to_web_report(data)
 
 if __name__ == "__main__":

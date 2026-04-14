@@ -79,16 +79,15 @@ The project evaluates the "viability range" for precomputing sequences:
 
 ## Dependencies
 
-The project is written in **Python 3.10+** and requires the following libraries for data analysis and visualization:
-* `matplotlib`: For plotting complexity curves.
-* `pandas`: For organizing metric tables.
-* `math`: For factorial calculations.
+The project is written in **Python 3.10+** and uses only the Python standard library.
+
+The interactive charts shown in `index.html` are rendered in JavaScript (Canvas API), so no plotting package is required.
 
 ## Usage
 
 1.  **Install dependencies**:
     ```bash
-    pip install matplotlib pandas
+    # No external Python packages required
     ```
 
 2.  **Run the analysis**:

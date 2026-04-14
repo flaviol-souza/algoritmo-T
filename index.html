@@ -196,7 +196,7 @@
       <h3>
         <ul>
           <li>CT-208 Computer Mathematics (ITA) - Prof. Luiz Mirizola</li>
-          <li>Authors: Flavio Souza and Nilson Sandy</li>
+          <li>Authors: Flavio Souza and Nilson Sangy</li>
         </ul>
       </h3>    
     </section>
@@ -393,7 +393,7 @@
       <div class="chart-grid">
         <article class="subcard">
           <h3>Fronteira entre tempo e memória</h3>
-          <p class="chart-desc">Cada ponto representa um valor de n. Y é o tempo (s), X é a memória (KB), ambos em escala logarítmica.</p>
+          <p class="chart-desc">Cada ponto representa um valor de n. Eixo Y = tempo total (s), eixo X = memória (KB), ambos em escala log10. Pontos até o maior n medido são observações reais de benchmark; pontos acima disso são projeções para estimar o ponto de virada. A projeção usa o maior n medido como base e aplica o mesmo fator de crescimento para tempo e memória (escala fatorial relativa com ajuste linear).</p>
           <canvas id="frontier-chart" class="chart" width="700" height="280"></canvas>
           <div class="chart-legend">
             <span class="legend-item"><span class="dot" style="background:var(--line-a)"></span>T Online</span>
@@ -1088,7 +1088,12 @@
         n,
         p: { total: { ...r.p.total } },
         t: {
-          offline: { ...r.t.offline },
+          offline: {
+            ...r.t.offline,
+            tab: { ...(r.t.offline?.tab || {}) },
+            op: { ...(r.t.offline?.op || {}) },
+            total: { ...(r.t.offline?.total || {}) }
+          },
           online: { ...r.t.online }
         },
         _projected: Boolean(r._projected)
@@ -1130,7 +1135,7 @@
         projected.t.online.memory_kb = base.t.online.memory_kb * linearScale;
 
         projected.t.offline.total.time_seconds = base.t.offline.total.time_seconds * factScale * linearScale;
-        projected.t.offline.memory_kb = base.t.offline.memory_kb * linearScale;
+        projected.t.offline.memory_kb = base.t.offline.memory_kb * factScale * linearScale;
 
         projected._projected = true;
 
@@ -1148,10 +1153,10 @@
       const projectedCount = turningRows.filter(r => r._projected).length;
 
       if (turningN == null) {
-        summary.textContent = `No turning point found in n=3..15 for limit ${fmt(memoryLimitKb)} KB (1 GB). Measured: n=3..${measuredMax}; projected points: ${projectedCount}.`;
+        summary.textContent = `Nenhum ponto de inflexão encontrado em n=3..15 para o limite de 1 GB (${fmt(memoryLimitKb)} KB). Regra: T memória > limite ou T tempo >= P tempo. Medido: n=3..${measuredMax}; pontos projetados: ${projectedCount}. Projeção: crescimento de tempo e memória com fator fatorial relativo ao maior n medido e ajuste linear.`;
       } else {
         
-        summary.textContent = `Ponto de inflexão estimado: n=${turningN} em n=3..15 para 1 GB (${fmt(memoryLimitKb)} KB), usando a regra: T memória > limite ou T tempo >= P tempo. Medido: n=3..${measuredMax}; pontos projetados: ${projectedCount}.`;
+        summary.textContent = `Ponto de inflexão estimado: n=${turningN} em n=3..15 para 1 GB (${fmt(memoryLimitKb)} KB), usando a regra: T memória > limite ou T tempo >= P tempo. Medido: n=3..${measuredMax}; pontos projetados: ${projectedCount}. Projeção: crescimento de tempo e memória com fator fatorial relativo ao maior n medido e ajuste linear.`;
       }
 
       drawFrontierChart("frontier-chart", turningRows, memoryLimitKb);
